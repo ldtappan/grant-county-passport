@@ -3,11 +3,7 @@ import { useState, useEffect, useMemo } from "react";
 // ─── DATA ────────────────────────────────────────────────────────────────────
 const CATEGORIES = [
   {
-    id: "breath",
-    label: "Breath of Fresh Air",
-    range: [1, 39],
-    color: "#4A9B6F",
-    emoji: "🌿",
+    id: "breath", label: "Breath of Fresh Air", range: [1, 39], color: "#4A9B6F", emoji: "🌿",
     items: [
       { n: 1, t: "Ride a horse" }, { n: 2, t: "Go tubing" }, { n: 3, t: "Blow bubbles" },
       { n: 4, t: "Catch butterflies" }, { n: 5, t: "Take a canoe trip" }, { n: 6, t: "Pitch a tent" },
@@ -28,12 +24,9 @@ const CATEGORIES = [
     ]
   },
   {
-    id: "adventure",
-    label: "A Call to Adventure",
-    range: [40, 66],
-    color: "#C05C1A",
-    emoji: "🚀",
+    id: "adventure", label: "A Call to Adventure", range: [40, 66], color: "#C05C1A", emoji: "🚀",
     items: [
+      { n: 40, t: "Make camping intense — pitch a tent and spend the night outdoors" },
       { n: 41, t: "Ride a 4-wheeler" }, { n: 42, t: "Ride in an airplane" }, { n: 43, t: "Go parachuting" },
       { n: 44, t: "Ride a motorcycle" }, { n: 45, t: "Climb a mountain" }, { n: 46, t: "Ride on a train" },
       { n: 47, t: "Ride a rollercoaster" }, { n: 48, t: "Ride on a tractor" },
@@ -45,35 +38,24 @@ const CATEGORIES = [
       { n: 61, t: "Ride a unicycle" }, { n: 62, t: "Do a ropes course" },
       { n: 63, t: "Swing from a trapeze" }, { n: 64, t: "Drive a stick shift" },
       { n: 65, t: "Visit an amusement park" }, { n: 66, t: "Shoot bow & arrow" },
-      { n: 40, t: "Make camping intense — pitch a tent and spend the night outdoors" },
     ]
   },
   {
-    id: "me",
-    label: "All About Me",
-    range: [67, 84],
-    color: "#7B5EA7",
-    emoji: "🌟",
+    id: "me", label: "All About Me", range: [67, 84], color: "#7B5EA7", emoji: "🌟",
     items: [
+      { n: 67, t: "Write a 'to do' list of 25 things you want to do before you reach 100" },
       { n: 68, t: "Be on TV" }, { n: 69, t: "Be on the radio" }, { n: 70, t: "Enter a contest" },
       { n: 71, t: "Receive a trophy" }, { n: 72, t: "Create a collection" }, { n: 73, t: "Decorate your room" },
       { n: 74, t: "Receive a special award" }, { n: 75, t: "Find your own quiet place" },
       { n: 76, t: "Learn a quote that inspires you" }, { n: 77, t: "Learn how to take compliments" },
       { n: 78, t: "Complete a personality profile" }, { n: 79, t: "Get your name in the newspaper" },
-      { n: 80, t: "List 5 things that you are good at" },
-      { n: 81, t: "Write a personal mission statement" },
-      { n: 82, t: "List 5 things that you'd like to learn" },
-      { n: 83, t: "Wear a jersey with your name on it" },
+      { n: 80, t: "List 5 things that you are good at" }, { n: 81, t: "Write a personal mission statement" },
+      { n: 82, t: "List 5 things that you'd like to learn" }, { n: 83, t: "Wear a jersey with your name on it" },
       { n: 84, t: "Collect postcards from places you'd like to see" },
-      { n: 67, t: "Write a 'to do' list of 25 things you want to do before you reach 100" },
     ]
   },
   {
-    id: "critter",
-    label: "Critter Corner",
-    range: [85, 103],
-    color: "#4A7FA5",
-    emoji: "🐾",
+    id: "critter", label: "Critter Corner", range: [85, 103], color: "#4A7FA5", emoji: "🐾",
     items: [
       { n: 85, t: "Learn to figure a dog's age in 'people' years" }, { n: 86, t: "Get a pet" },
       { n: 87, t: "Feed a giraffe" }, { n: 88, t: "Catch a frog" }, { n: 89, t: "Bathe a dog" },
@@ -82,16 +64,11 @@ const CATEGORIES = [
       { n: 95, t: "Play fetch with a dog" }, { n: 96, t: "Pet 4-H fair animals" },
       { n: 97, t: "Count aquarium fish" }, { n: 98, t: "Help care for a pet" },
       { n: 99, t: "Visit a pet store" }, { n: 100, t: "Shear a sheep" },
-      { n: 101, t: "Go to a petting zoo" }, { n: 102, t: "See an animal birth" },
-      { n: 103, t: "Hold a baby chick" },
+      { n: 101, t: "Go to a petting zoo" }, { n: 102, t: "See an animal birth" }, { n: 103, t: "Hold a baby chick" },
     ]
   },
   {
-    id: "taste",
-    label: "Taste Test",
-    range: [104, 188],
-    color: "#C0392B",
-    emoji: "🍽️",
+    id: "taste", label: "Taste Test", range: [104, 188], color: "#C0392B", emoji: "🍽️",
     items: [
       { n: 104, t: "Eat an artichoke" }, { n: 105, t: "Make jam" }, { n: 106, t: "Eat tapas" },
       { n: 107, t: "Eat at a drive-in" }, { n: 108, t: "Eat a s'more" }, { n: 109, t: "Eat lobster" },
@@ -134,11 +111,7 @@ const CATEGORIES = [
     ]
   },
   {
-    id: "future",
-    label: "Map Your Future",
-    range: [189, 233],
-    color: "#1A6B8A",
-    emoji: "🎓",
+    id: "future", label: "Map Your Future", range: [189, 233], color: "#1A6B8A", emoji: "🎓",
     items: [
       { n: 189, t: "Graduate high school" }, { n: 190, t: "Research a career" },
       { n: 191, t: "Apply to a college" }, { n: 192, t: "Take the SAT and ACT" },
@@ -148,8 +121,7 @@ const CATEGORIES = [
       { n: 199, t: "Learn about the military" }, { n: 200, t: "Create a professional email account" },
       { n: 201, t: "Tell someone what you want to be" }, { n: 202, t: "Complete a higher education plan" },
       { n: 203, t: "Create a high school graduation plan" }, { n: 204, t: "Meet a college admissions counselor" },
-      { n: 205, t: "Ask an adult about the first job they ever had" },
-      { n: 206, t: "Create a professional resume" },
+      { n: 205, t: "Ask an adult about the first job they ever had" }, { n: 206, t: "Create a professional resume" },
       { n: 207, t: "Take a summer program at a college campus" },
       { n: 208, t: "Turn homework in on time for a whole semester" },
       { n: 209, t: "Get perfect school attendance for one year" },
@@ -158,45 +130,30 @@ const CATEGORIES = [
       { n: 212, t: "Participate in class discussion for a week" },
       { n: 213, t: "Help a custodian clean up the school" },
       { n: 214, t: "Write three goals for the school year" },
-      { n: 215, t: "Complete a scholarship application" },
-      { n: 216, t: "Volunteer to help a teacher" },
-      { n: 217, t: "Be on time for school for one year" },
-      { n: 218, t: "Complete a career interest survey" },
-      { n: 219, t: "Help a classmate with homework" },
-      { n: 220, t: "Take part in a school fundraiser" },
-      { n: 221, t: "Take an AP class in high school" },
-      { n: 222, t: "Visit one college in the county" },
-      { n: 223, t: "Read 5 books that interest you" },
-      { n: 224, t: "Visit two colleges in the state" },
-      { n: 225, t: "Compete in the science fair" },
-      { n: 226, t: "Run for a class position" },
-      { n: 227, t: "Visit a science museum" },
-      { n: 228, t: "Visit an art museum" },
-      { n: 229, t: "Visit a historical museum" },
-      { n: 230, t: "Take a foreign language class" },
-      { n: 231, t: "Take a sign language class" },
-      { n: 232, t: "Be a teacher's assistant" },
+      { n: 215, t: "Complete a scholarship application" }, { n: 216, t: "Volunteer to help a teacher" },
+      { n: 217, t: "Be on time for school for one year" }, { n: 218, t: "Complete a career interest survey" },
+      { n: 219, t: "Help a classmate with homework" }, { n: 220, t: "Take part in a school fundraiser" },
+      { n: 221, t: "Take an AP class in high school" }, { n: 222, t: "Visit one college in the county" },
+      { n: 223, t: "Read 5 books that interest you" }, { n: 224, t: "Visit two colleges in the state" },
+      { n: 225, t: "Compete in the science fair" }, { n: 226, t: "Run for a class position" },
+      { n: 227, t: "Visit a science museum" }, { n: 228, t: "Visit an art museum" },
+      { n: 229, t: "Visit a historical museum" }, { n: 230, t: "Take a foreign language class" },
+      { n: 231, t: "Take a sign language class" }, { n: 232, t: "Be a teacher's assistant" },
       { n: 233, t: "Go to a college fair" },
     ]
   },
   {
-    id: "play",
-    label: "Play Hard",
-    range: [234, 294],
-    color: "#E67E22",
-    emoji: "⚽",
+    id: "play", label: "Play Hard", range: [234, 294], color: "#E67E22", emoji: "⚽",
     items: [
-      { n: 234, t: "Throw out the first pitch at a baseball game" },
-      { n: 235, t: "Drive a golf cart" }, { n: 236, t: "Run a 5K" }, { n: 237, t: "Play golf" },
-      { n: 238, t: "Play tennis" }, { n: 239, t: "Go surfing" }, { n: 240, t: "Play baseball" },
-      { n: 241, t: "Skateboard" }, { n: 242, t: "Play dodgeball" }, { n: 243, t: "Go snow skiing" },
-      { n: 244, t: "Play disc golf" }, { n: 245, t: "Play croquet" }, { n: 246, t: "Play paintball" },
-      { n: 247, t: "Go ice skating" }, { n: 248, t: "Play tag" }, { n: 249, t: "Go to a Colts game" },
-      { n: 250, t: "Play a team sport" }, { n: 251, t: "Play corn hole" },
-      { n: 252, t: "Learn how to dive" }, { n: 253, t: "Ride a caster board" },
-      { n: 254, t: "Play racquetball" }, { n: 255, t: "Play kickball" },
-      { n: 256, t: "Learn self-defense" }, { n: 257, t: "Climb a rock wall" },
-      { n: 258, t: "Play volleyball" }, { n: 259, t: "Watch the Olympics" },
+      { n: 234, t: "Throw out the first pitch at a baseball game" }, { n: 235, t: "Drive a golf cart" },
+      { n: 236, t: "Run a 5K" }, { n: 237, t: "Play golf" }, { n: 238, t: "Play tennis" },
+      { n: 239, t: "Go surfing" }, { n: 240, t: "Play baseball" }, { n: 241, t: "Skateboard" },
+      { n: 242, t: "Play dodgeball" }, { n: 243, t: "Go snow skiing" }, { n: 244, t: "Play disc golf" },
+      { n: 245, t: "Play croquet" }, { n: 246, t: "Play paintball" }, { n: 247, t: "Go ice skating" },
+      { n: 248, t: "Play tag" }, { n: 249, t: "Go to a Colts game" }, { n: 250, t: "Play a team sport" },
+      { n: 251, t: "Play corn hole" }, { n: 252, t: "Learn how to dive" }, { n: 253, t: "Ride a caster board" },
+      { n: 254, t: "Play racquetball" }, { n: 255, t: "Play kickball" }, { n: 256, t: "Learn self-defense" },
+      { n: 257, t: "Climb a rock wall" }, { n: 258, t: "Play volleyball" }, { n: 259, t: "Watch the Olympics" },
       { n: 260, t: "Hit the batting cages" }, { n: 261, t: "Ride a tandem bike" },
       { n: 262, t: "Run a half marathon" }, { n: 263, t: "Go black light bowling" },
       { n: 264, t: "Watch the Stanley Cup" }, { n: 265, t: "Watch the Final Four" },
@@ -211,10 +168,8 @@ const CATEGORIES = [
       { n: 282, t: "Be a fan at a local football game" }, { n: 283, t: "Make a 3-point basketball shot" },
       { n: 284, t: "Learn/teach someone to ride a bike" },
       { n: 285, t: "Swim the length of a pool without stopping" },
-      { n: 286, t: "Be a fan at the Special Olympics" },
-      { n: 287, t: "Learn how to keep score in tennis" },
-      { n: 288, t: "Watch or listen to the Indy 500" },
-      { n: 289, t: "Go to a professional baseball game" },
+      { n: 286, t: "Be a fan at the Special Olympics" }, { n: 287, t: "Learn how to keep score in tennis" },
+      { n: 288, t: "Watch or listen to the Indy 500" }, { n: 289, t: "Go to a professional baseball game" },
       { n: 290, t: "Go to a professional basketball game" },
       { n: 291, t: "Be a fan at local girls basketball game" },
       { n: 292, t: "Be a fan at a local boys basketball game" },
@@ -223,11 +178,7 @@ const CATEGORIES = [
     ]
   },
   {
-    id: "screen",
-    label: "The Big Screen",
-    range: [295, 314],
-    color: "#8E44AD",
-    emoji: "🎬",
+    id: "screen", label: "The Big Screen", range: [295, 314], color: "#8E44AD", emoji: "🎬",
     items: [
       { n: 295, t: "Meet a movie star" }, { n: 296, t: "Write a play" }, { n: 297, t: "Cry during a movie" },
       { n: 298, t: "See a midnight movie" }, { n: 299, t: "Watch a Muppet movie" },
@@ -237,38 +188,31 @@ const CATEGORIES = [
       { n: 306, t: "Sit in the front row at a movie" }, { n: 307, t: "Watch a movie under the stars" },
       { n: 308, t: "Watch a complete TV series" }, { n: 309, t: "Make a list of your favorite movies" },
       { n: 310, t: "See a movie after you've read the book" },
-      { n: 311, t: "Watch a movie at IWU's Globe Theater" },
-      { n: 312, t: "Watch a 3D or IMAX movie" },
+      { n: 311, t: "Watch a movie at IWU's Globe Theater" }, { n: 312, t: "Watch a 3D or IMAX movie" },
       { n: 313, t: "Tour a movie theater for a behind-the-scenes look" },
       { n: 314, t: "Watch a James Dean movie (Grant County's favorite son)" },
     ]
   },
   {
-    id: "express",
-    label: "Express Yourself",
-    range: [315, 376],
-    color: "#D35400",
-    emoji: "🎨",
+    id: "express", label: "Express Yourself", range: [315, 376], color: "#D35400", emoji: "🎨",
     items: [
       { n: 315, t: "Be an actor" }, { n: 316, t: "Finger paint" }, { n: 317, t: "Knit a scarf" },
       { n: 318, t: "Make a video" }, { n: 319, t: "Go to a musical" }, { n: 320, t: "Learn to quilt" },
       { n: 321, t: "Sing karaoke" }, { n: 322, t: "Color eggs" }, { n: 323, t: "Be a drummer" },
-      { n: 324, t: "Go to a concert" }, { n: 325, t: "Make a flip book" },
-      { n: 326, t: "Take an art class" }, { n: 327, t: "Paint a child's face" },
-      { n: 328, t: "Try out for a play" }, { n: 329, t: "Make up a song" },
-      { n: 330, t: "Tie dye a t-shirt" }, { n: 331, t: "Write a poem" },
-      { n: 332, t: "Emboss something" }, { n: 333, t: "Create a piece of art" },
-      { n: 334, t: "Create and sell an original piece of art" },
-      { n: 335, t: "Play the bagpipes" }, { n: 336, t: "Attend a symphony" },
-      { n: 337, t: "Make a scarecrow" }, { n: 338, t: "Make a scrapbook" },
-      { n: 339, t: "Make a balloon animal" }, { n: 340, t: "Bow or curtsy on stage" },
-      { n: 341, t: "Learn how to crochet" }, { n: 342, t: "Audition for something" },
-      { n: 343, t: "Decoupage something" }, { n: 344, t: "Design a party invitation" },
-      { n: 345, t: "Make a duct tape wallet" }, { n: 346, t: "Get your face painted" },
-      { n: 347, t: "Make finger puppets" }, { n: 348, t: "Make an origami crane" },
-      { n: 349, t: "Make a craft at the library" }, { n: 350, t: "Make paper snowflakes" },
-      { n: 351, t: "Make a homemade gift" }, { n: 352, t: "Illustrate a short story" },
-      { n: 353, t: "Perform a puppet show" }, { n: 354, t: "Make a statue out of pasta" },
+      { n: 324, t: "Go to a concert" }, { n: 325, t: "Make a flip book" }, { n: 326, t: "Take an art class" },
+      { n: 327, t: "Paint a child's face" }, { n: 328, t: "Try out for a play" }, { n: 329, t: "Make up a song" },
+      { n: 330, t: "Tie dye a t-shirt" }, { n: 331, t: "Write a poem" }, { n: 332, t: "Emboss something" },
+      { n: 333, t: "Create a piece of art" }, { n: 334, t: "Create and sell an original piece of art" },
+      { n: 335, t: "Play the bagpipes" }, { n: 336, t: "Attend a symphony" }, { n: 337, t: "Make a scarecrow" },
+      { n: 338, t: "Make a scrapbook" }, { n: 339, t: "Make a balloon animal" },
+      { n: 340, t: "Bow or curtsy on stage" }, { n: 341, t: "Learn how to crochet" },
+      { n: 342, t: "Audition for something" }, { n: 343, t: "Decoupage something" },
+      { n: 344, t: "Design a party invitation" }, { n: 345, t: "Make a duct tape wallet" },
+      { n: 346, t: "Get your face painted" }, { n: 347, t: "Make finger puppets" },
+      { n: 348, t: "Make an origami crane" }, { n: 349, t: "Make a craft at the library" },
+      { n: 350, t: "Make paper snowflakes" }, { n: 351, t: "Make a homemade gift" },
+      { n: 352, t: "Illustrate a short story" }, { n: 353, t: "Perform a puppet show" },
+      { n: 354, t: "Make a statue out of pasta" },
       { n: 355, t: "Spend an evening at the theater and meet the cast" },
       { n: 356, t: "Perform in a talent show" }, { n: 357, t: "Attend an air band concert" },
       { n: 358, t: "Make a gingerbread house" }, { n: 359, t: "Make a dream board" },
@@ -287,11 +231,7 @@ const CATEGORIES = [
     ]
   },
   {
-    id: "celebrate",
-    label: "Celebrate Good Times",
-    range: [377, 402],
-    color: "#F39C12",
-    emoji: "🎉",
+    id: "celebrate", label: "Celebrate Good Times", range: [377, 402], color: "#F39C12", emoji: "🎉",
     items: [
       { n: 377, t: "Go to a luau" }, { n: 378, t: "Carve pumpkins" }, { n: 379, t: "Go to a wedding" },
       { n: 380, t: "Attend a baptism" }, { n: 381, t: "Celebrate leap year" },
@@ -302,53 +242,41 @@ const CATEGORIES = [
       { n: 390, t: "Visit the Walkway of Lights" }, { n: 391, t: "Decorate a Christmas tree" },
       { n: 392, t: "Wear a Christmas sweater" }, { n: 393, t: "Surprise someone with a gift" },
       { n: 394, t: "Eat lasagna on Garfield's birthday" }, { n: 395, t: "Celebrate Chinese New Year" },
-      { n: 396, t: "Find out what Auld Lang Syne means" },
-      { n: 397, t: "Attend a neighborhood block party" },
-      { n: 398, t: "Watch Macy's Thanksgiving parade" },
-      { n: 399, t: "Create May Day baskets for neighbors" },
+      { n: 396, t: "Find out what Auld Lang Syne means" }, { n: 397, t: "Attend a neighborhood block party" },
+      { n: 398, t: "Watch Macy's Thanksgiving parade" }, { n: 399, t: "Create May Day baskets for neighbors" },
       { n: 400, t: "Watch the ball drop on New Year's Eve" },
       { n: 401, t: "Learn a new version of Happy Birthday" },
       { n: 402, t: "Celebrate a once-in-a-lifetime date (like 4-3-21 or 2-2-22)" },
     ]
   },
   {
-    id: "connections",
-    label: "Creating Connections",
-    range: [403, 421],
-    color: "#2980B9",
-    emoji: "🌐",
+    id: "connections", label: "Creating Connections", range: [403, 421], color: "#2980B9", emoji: "🌐",
     items: [
-      { n: 404, t: "Make a website" }, { n: 405, t: "Make a podcast" }, { n: 406, t: "Google your name" },
-      { n: 407, t: "Wear cowboy boots" }, { n: 408, t: "Visit a house of worship" },
-      { n: 409, t: "Make a room feng shui" }, { n: 410, t: "Teach someone to use email" },
-      { n: 411, t: "Learn what mahalo means" }, { n: 412, t: "Make an exercise playlist" },
-      { n: 413, t: "Subscribe to an RSS feed" }, { n: 414, t: "Video chat with someone" },
-      { n: 415, t: "Attend a youth group event" }, { n: 416, t: "Learn how to navigate the Internet" },
-      { n: 417, t: "Fist bump someone 40 years older" },
+      { n: 403, t: "Order your meal in Spanish at a Mexican restaurant" }, { n: 404, t: "Make a website" },
+      { n: 405, t: "Make a podcast" }, { n: 406, t: "Google your name" }, { n: 407, t: "Wear cowboy boots" },
+      { n: 408, t: "Visit a house of worship" }, { n: 409, t: "Make a room feng shui" },
+      { n: 410, t: "Teach someone to use email" }, { n: 411, t: "Learn what mahalo means" },
+      { n: 412, t: "Make an exercise playlist" }, { n: 413, t: "Subscribe to an RSS feed" },
+      { n: 414, t: "Video chat with someone" }, { n: 415, t: "Attend a youth group event" },
+      { n: 416, t: "Learn how to navigate the Internet" }, { n: 417, t: "Fist bump someone 40 years older" },
       { n: 418, t: "Interview a couple married 50 years" },
       { n: 419, t: "Interview someone 50 years old or older" },
       { n: 420, t: "Find out a teacher's best school memory" },
       { n: 421, t: "Attend a summer program at the library" },
-      { n: 403, t: "Order your meal in Spanish at a Mexican restaurant" },
     ]
   },
   {
-    id: "friends",
-    label: "Friends Forever",
-    range: [422, 445],
-    color: "#E91E8C",
-    emoji: "👫",
+    id: "friends", label: "Friends Forever", range: [422, 445], color: "#E91E8C", emoji: "👫",
     items: [
-      { n: 422, t: "Play hopscotch" }, { n: 423, t: "Go fishing with a friend" },
-      { n: 424, t: "Say you're sorry" }, { n: 425, t: "Have a pizza party" },
-      { n: 426, t: "Have a snowball fight" }, { n: 427, t: "Take a friend to lunch" },
-      { n: 428, t: "Compliment a friend" }, { n: 429, t: "Watch fireworks" },
-      { n: 430, t: "Help a friend do a chore" }, { n: 431, t: "Write a letter to a pen pal" },
-      { n: 432, t: "French braid a friend's hair" }, { n: 433, t: "Make a friendship bracelet" },
-      { n: 434, t: "Take a friend roller skating" }, { n: 435, t: "Solve a mystery with a friend" },
-      { n: 436, t: "Go on a vacation with a friend" }, { n: 437, t: "Read the same book as a friend" },
-      { n: 438, t: "Give a handmade birthday card" }, { n: 439, t: "Give a handmade get-well card" },
-      { n: 440, t: "Throw a surprise party for a friend" },
+      { n: 422, t: "Play hopscotch" }, { n: 423, t: "Go fishing with a friend" }, { n: 424, t: "Say you're sorry" },
+      { n: 425, t: "Have a pizza party" }, { n: 426, t: "Have a snowball fight" },
+      { n: 427, t: "Take a friend to lunch" }, { n: 428, t: "Compliment a friend" },
+      { n: 429, t: "Watch fireworks" }, { n: 430, t: "Help a friend do a chore" },
+      { n: 431, t: "Write a letter to a pen pal" }, { n: 432, t: "French braid a friend's hair" },
+      { n: 433, t: "Make a friendship bracelet" }, { n: 434, t: "Take a friend roller skating" },
+      { n: 435, t: "Solve a mystery with a friend" }, { n: 436, t: "Go on a vacation with a friend" },
+      { n: 437, t: "Read the same book as a friend" }, { n: 438, t: "Give a handmade birthday card" },
+      { n: 439, t: "Give a handmade get-well card" }, { n: 440, t: "Throw a surprise party for a friend" },
       { n: 441, t: "Split a dozen donut holes with a friend" },
       { n: 442, t: "Be a friend to someone who needs one" },
       { n: 443, t: "Slip a note of encouragement in a friend's locker" },
@@ -357,11 +285,7 @@ const CATEGORIES = [
     ]
   },
   {
-    id: "games",
-    label: "Fun and Games",
-    range: [446, 507],
-    color: "#16A085",
-    emoji: "🎲",
+    id: "games", label: "Fun and Games", range: [446, 507], color: "#16A085", emoji: "🎲",
     items: [
       { n: 446, t: "Play bingo" }, { n: 447, t: "Join a club" }, { n: 448, t: "Play pool" },
       { n: 449, t: "Play spoons" }, { n: 450, t: "Play pinball" }, { n: 451, t: "Play laser tag" },
@@ -369,87 +293,70 @@ const CATEGORIES = [
       { n: 455, t: "Play hopscotch" }, { n: 456, t: "Play dominoes" }, { n: 457, t: "Play Scrabble" },
       { n: 458, t: "Play ping pong" }, { n: 459, t: "Learn Solitaire" }, { n: 460, t: "Play Tic-Tac-Toe" },
       { n: 461, t: "Play badminton" }, { n: 462, t: "Use a Hula Hoop" }, { n: 463, t: "Play Dutch Blitz" },
-      { n: 464, t: "Play Tug-o-War" }, { n: 465, t: "Have an egg toss" },
-      { n: 466, t: "Learn a yo-yo trick" }, { n: 467, t: "Learn a magic trick and perform it" },
-      { n: 468, t: "Learn how to play horseshoes" }, { n: 469, t: "Play in a sprinkler" },
-      { n: 470, t: "Play in a treehouse" }, { n: 471, t: "Play hide and seek" },
-      { n: 472, t: "Go down a slide" }, { n: 473, t: "Go roller skating" },
-      { n: 474, t: "Play miniature golf" }, { n: 475, t: "Create a new game" },
-      { n: 476, t: "Play ladder golf" }, { n: 477, t: "Test drive an iPad" },
-      { n: 478, t: "Swing on a tire swing" }, { n: 479, t: "Play Transformers" },
-      { n: 480, t: "Play Trivial Pursuit" }, { n: 481, t: "Win a video game" },
-      { n: 482, t: "Build a snow fort" }, { n: 483, t: "Walk a Slinky down stairs" },
-      { n: 484, t: "Compete in a sack race" }, { n: 485, t: "Learn how to play chess" },
-      { n: 486, t: "Finish a crossword puzzle" }, { n: 487, t: "Arrange dominoes to fall" },
-      { n: 488, t: "Play a game of HORSE" }, { n: 489, t: "Attend a school carnival" },
-      { n: 490, t: "Learn how to play Euchre" }, { n: 491, t: "Ride in a gigaball (Zorbing)" },
-      { n: 492, t: "Play a game of Frisbee" }, { n: 493, t: "Play a license plate game" },
-      { n: 494, t: "Create a series of memes" }, { n: 495, t: "Learn to use a pogo stick" },
-      { n: 496, t: "Fly a remote control plane" }, { n: 497, t: "Play Would You Rather" },
-      { n: 498, t: "Have a squirt gun fight" }, { n: 499, t: "Do an extracurricular activity" },
-      { n: 500, t: "Organize a scavenger hunt" }, { n: 501, t: "Play a game of charades" },
-      { n: 502, t: "Have a water balloon fight" }, { n: 503, t: "Solve the triangle peg game" },
-      { n: 504, t: "Dress like a friend for Twin Day" },
+      { n: 464, t: "Play Tug-o-War" }, { n: 465, t: "Have an egg toss" }, { n: 466, t: "Learn a yo-yo trick" },
+      { n: 467, t: "Learn a magic trick and perform it" }, { n: 468, t: "Learn how to play horseshoes" },
+      { n: 469, t: "Play in a sprinkler" }, { n: 470, t: "Play in a treehouse" },
+      { n: 471, t: "Play hide and seek" }, { n: 472, t: "Go down a slide" }, { n: 473, t: "Go roller skating" },
+      { n: 474, t: "Play miniature golf" }, { n: 475, t: "Create a new game" }, { n: 476, t: "Play ladder golf" },
+      { n: 477, t: "Test drive an iPad" }, { n: 478, t: "Swing on a tire swing" },
+      { n: 479, t: "Play Transformers" }, { n: 480, t: "Play Trivial Pursuit" },
+      { n: 481, t: "Win a video game" }, { n: 482, t: "Build a snow fort" },
+      { n: 483, t: "Walk a Slinky down stairs" }, { n: 484, t: "Compete in a sack race" },
+      { n: 485, t: "Learn how to play chess" }, { n: 486, t: "Finish a crossword puzzle" },
+      { n: 487, t: "Arrange dominoes to fall" }, { n: 488, t: "Play a game of HORSE" },
+      { n: 489, t: "Attend a school carnival" }, { n: 490, t: "Learn how to play Euchre" },
+      { n: 491, t: "Ride in a gigaball (Zorbing)" }, { n: 492, t: "Play a game of Frisbee" },
+      { n: 493, t: "Play a license plate game" }, { n: 494, t: "Create a series of memes" },
+      { n: 495, t: "Learn to use a pogo stick" }, { n: 496, t: "Fly a remote control plane" },
+      { n: 497, t: "Play Would You Rather" }, { n: 498, t: "Have a squirt gun fight" },
+      { n: 499, t: "Do an extracurricular activity" }, { n: 500, t: "Organize a scavenger hunt" },
+      { n: 501, t: "Play a game of charades" }, { n: 502, t: "Have a water balloon fight" },
+      { n: 503, t: "Solve the triangle peg game" }, { n: 504, t: "Dress like a friend for Twin Day" },
       { n: 505, t: "Play a complete game of Monopoly" },
-      { n: 506, t: "Have a watermelon seed-spittin' contest" },
-      { n: 507, t: "Learn how to limbo" },
+      { n: 506, t: "Have a watermelon seed-spittin' contest" }, { n: 507, t: "Learn how to limbo" },
     ]
   },
   {
-    id: "give",
-    label: "Give a Little Bit",
-    range: [508, 568],
-    color: "#27AE60",
-    emoji: "🤝",
+    id: "give", label: "Give a Little Bit", range: [508, 568], color: "#27AE60", emoji: "🤝",
     items: [
       { n: 508, t: "Donate to charity" }, { n: 509, t: "Pick up litter" }, { n: 510, t: "Donate blood" },
       { n: 511, t: "Thank a firefighter" }, { n: 512, t: "Thank a police officer" },
       { n: 513, t: "Thank a soldier" }, { n: 514, t: "Give a coat to a child" },
       { n: 515, t: "Make a candygram" }, { n: 516, t: "Send a care package" },
-      { n: 517, t: "Say 'Thank you'" }, { n: 518, t: "Save spare change" },
-      { n: 519, t: "Volunteer" }, { n: 520, t: "Do chores at home" },
-      { n: 521, t: "Clean your block" }, { n: 522, t: "Help wash dishes" },
+      { n: 517, t: "Say 'Thank you'" }, { n: 518, t: "Save spare change" }, { n: 519, t: "Volunteer" },
+      { n: 520, t: "Do chores at home" }, { n: 521, t: "Clean your block" }, { n: 522, t: "Help wash dishes" },
       { n: 523, t: "Volunteer to walk a dog" }, { n: 524, t: "Give a child school supplies" },
       { n: 525, t: "Dust someone's ceiling fans" }, { n: 526, t: "Help someone move" },
       { n: 527, t: "Give someone a flower" }, { n: 528, t: "Organize a fundraiser" },
-      { n: 529, t: "Collect non-perishable food for a local pantry" },
-      { n: 530, t: "Go on a service trip" }, { n: 531, t: "Mow a yard for free" },
-      { n: 532, t: "Buy someone coffee" }, { n: 533, t: "Be a political volunteer" },
-      { n: 534, t: "Give a loved one a rose" }, { n: 535, t: "Donate used clothes or toys" },
-      { n: 536, t: "Take part in a fundraiser" }, { n: 537, t: "Read a story to your parents" },
-      { n: 538, t: "Ring the Salvation Army bell" }, { n: 539, t: "Shovel someone's driveway" },
-      { n: 540, t: "Serve food to the needy" }, { n: 541, t: "Carry someone's groceries" },
-      { n: 542, t: "Send an encouragement card" }, { n: 543, t: "Do a random act of kindness" },
-      { n: 544, t: "Play checkers with a senior citizen" },
-      { n: 545, t: "Enroll someone in Imagination Library" },
-      { n: 546, t: "Deliver gifts to nursing home" },
-      { n: 547, t: "Read a story to someone younger" },
-      { n: 548, t: "Rake someone's yard for free" }, { n: 549, t: "Work in a concession stand" },
-      { n: 550, t: "Tell someone they are amazing" }, { n: 551, t: "Pick up trash around school" },
+      { n: 529, t: "Collect non-perishable food for a local pantry" }, { n: 530, t: "Go on a service trip" },
+      { n: 531, t: "Mow a yard for free" }, { n: 532, t: "Buy someone coffee" },
+      { n: 533, t: "Be a political volunteer" }, { n: 534, t: "Give a loved one a rose" },
+      { n: 535, t: "Donate used clothes or toys" }, { n: 536, t: "Take part in a fundraiser" },
+      { n: 537, t: "Read a story to your parents" }, { n: 538, t: "Ring the Salvation Army bell" },
+      { n: 539, t: "Shovel someone's driveway" }, { n: 540, t: "Serve food to the needy" },
+      { n: 541, t: "Carry someone's groceries" }, { n: 542, t: "Send an encouragement card" },
+      { n: 543, t: "Do a random act of kindness" }, { n: 544, t: "Play checkers with a senior citizen" },
+      { n: 545, t: "Enroll someone in Imagination Library" }, { n: 546, t: "Deliver gifts to nursing home" },
+      { n: 547, t: "Read a story to someone younger" }, { n: 548, t: "Rake someone's yard for free" },
+      { n: 549, t: "Work in a concession stand" }, { n: 550, t: "Tell someone they are amazing" },
+      { n: 551, t: "Pick up trash around school" },
       { n: 552, t: "Clean up a section of the Cardinal Greenway" },
       { n: 553, t: "Thank a waiter/waitress" }, { n: 554, t: "Wash someone's car for free" },
-      { n: 555, t: "Clean a neighbor's windows" },
-      { n: 556, t: "Make Valentines for a nursing home" },
-      { n: 557, t: "Pull weeds at a community garden" },
-      { n: 558, t: "Take a meal to a homebound person" },
+      { n: 555, t: "Clean a neighbor's windows" }, { n: 556, t: "Make Valentines for a nursing home" },
+      { n: 557, t: "Pull weeds at a community garden" }, { n: 558, t: "Take a meal to a homebound person" },
       { n: 559, t: "Have a lemonade stand for charity" },
       { n: 560, t: "Pay for the car behind you in the drive-thru" },
       { n: 561, t: "Donate pet supplies to an animal shelter" },
       { n: 562, t: "Draw a picture for a senior neighbor" },
       { n: 563, t: "Wear pink for Breast Cancer Awareness Month" },
       { n: 564, t: "Make rice therapy bags for cancer patients" },
-      { n: 565, t: "Help a non-profit with a mass mailing" },
-      { n: 566, t: "Hold the door open for a stranger" },
+      { n: 565, t: "Help a non-profit with a mass mailing" }, { n: 566, t: "Hold the door open for a stranger" },
       { n: 567, t: "Pet sit for a neighbor for free" },
       { n: 568, t: "Volunteer with a person or organization in your community" },
     ]
   },
   {
-    id: "grownup",
-    label: "Grown-Up Stuff",
-    range: [569, 612],
-    color: "#566573",
-    emoji: "🔑",
+    id: "grownup", label: "Grown-Up Stuff", range: [569, 612], color: "#566573", emoji: "🔑",
     items: [
       { n: 569, t: "Set your own alarm" }, { n: 570, t: "Get a job" },
       { n: 571, t: "Sign your name to a contract" }, { n: 572, t: "Help wax a car" },
@@ -469,8 +376,7 @@ const CATEGORIES = [
       { n: 600, t: "Learn how to wash clothes" }, { n: 601, t: "Eat no sweets for a week" },
       { n: 602, t: "Teach a friend a new skill" }, { n: 603, t: "Open a checking account" },
       { n: 604, t: "Learn how to add air to tires" }, { n: 605, t: "Clean your toilet" },
-      { n: 606, t: "Turn off the TV for an entire week" },
-      { n: 607, t: "Teach a child how to tie their shoes" },
+      { n: 606, t: "Turn off the TV for an entire week" }, { n: 607, t: "Teach a child how to tie their shoes" },
       { n: 608, t: "Research cost of car insurance for teens" },
       { n: 609, t: "Make a habit of turning lights off" },
       { n: 610, t: "Draw a fire evacuation plan for your house" },
@@ -479,38 +385,32 @@ const CATEGORIES = [
     ]
   },
   {
-    id: "healthy",
-    label: "Healthy & Wealthy",
-    range: [613, 671],
-    color: "#1ABC9C",
-    emoji: "💪",
+    id: "healthy", label: "Healthy & Wealthy", range: [613, 671], color: "#1ABC9C", emoji: "💪",
     items: [
       { n: 615, t: "Save $100" }, { n: 616, t: "Do yoga" }, { n: 617, t: "Make a speech" },
-      { n: 618, t: "See a bank vault" }, { n: 619, t: "Join a book club" },
-      { n: 620, t: "Visit a dentist" }, { n: 621, t: "Learn risks of drugs" },
-      { n: 622, t: "Hold a caterpillar" }, { n: 623, t: "Floss every day" },
-      { n: 624, t: "Learn to use an ATM" }, { n: 625, t: "Recycle 50 cans" },
-      { n: 626, t: "Workout at a gym" }, { n: 627, t: "Read a chapter book" },
-      { n: 628, t: "Start your own blog" }, { n: 629, t: "Memorize a speech" },
-      { n: 630, t: "Write a creative story" }, { n: 631, t: "Listen to a storyteller" },
-      { n: 632, t: "Listen to a heartbeat" }, { n: 633, t: "Create a family budget" },
-      { n: 634, t: "Find someone's pulse" }, { n: 635, t: "Learn about recycling" },
-      { n: 636, t: "Make an M&M color graph" }, { n: 637, t: "Take your blood pressure" },
-      { n: 638, t: "Follow someone's blog" }, { n: 639, t: "Learn the Heimlich Maneuver" },
-      { n: 640, t: "Learn a second language" }, { n: 641, t: "Check out a library book" },
-      { n: 642, t: "Read a local newspaper" }, { n: 643, t: "Watch the evening news" },
-      { n: 644, t: "Attend a nutrition class" }, { n: 645, t: "Create a new business name" },
-      { n: 646, t: "Take a tour of a health clinic" }, { n: 647, t: "Read an award-winning book" },
-      { n: 648, t: "Learn the different car parts" }, { n: 649, t: "Learn what carpe diem means" },
-      { n: 650, t: "Learn how to write a check" }, { n: 651, t: "Learn to create a budget" },
-      { n: 652, t: "Watch TV with closed captions" }, { n: 653, t: "Do deep breathing exercise" },
-      { n: 654, t: "Learn proper teeth brushing" }, { n: 655, t: "Compare 3 products & price" },
-      { n: 656, t: "Learn 5 healthy eating tips" }, { n: 657, t: "Watch a program on PBS" },
-      { n: 658, t: "Send the President a letter" }, { n: 659, t: "Open a savings account" },
-      { n: 660, t: "Use 10 sign language words" }, { n: 661, t: "Test your smoke detectors" },
-      { n: 662, t: "Practice spelling words" }, { n: 663, t: "Learn your squares (1x1...)" },
-      { n: 664, t: "Learn the national anthem" }, { n: 665, t: "Write a letter to the editor" },
-      { n: 666, t: "Learn to take temperature" },
+      { n: 618, t: "See a bank vault" }, { n: 619, t: "Join a book club" }, { n: 620, t: "Visit a dentist" },
+      { n: 621, t: "Learn risks of drugs" }, { n: 622, t: "Hold a caterpillar" }, { n: 623, t: "Floss every day" },
+      { n: 624, t: "Learn to use an ATM" }, { n: 625, t: "Recycle 50 cans" }, { n: 626, t: "Workout at a gym" },
+      { n: 627, t: "Read a chapter book" }, { n: 628, t: "Start your own blog" },
+      { n: 629, t: "Memorize a speech" }, { n: 630, t: "Write a creative story" },
+      { n: 631, t: "Listen to a storyteller" }, { n: 632, t: "Listen to a heartbeat" },
+      { n: 633, t: "Create a family budget" }, { n: 634, t: "Find someone's pulse" },
+      { n: 635, t: "Learn about recycling" }, { n: 636, t: "Make an M&M color graph" },
+      { n: 637, t: "Take your blood pressure" }, { n: 638, t: "Follow someone's blog" },
+      { n: 639, t: "Learn the Heimlich Maneuver" }, { n: 640, t: "Learn a second language" },
+      { n: 641, t: "Check out a library book" }, { n: 642, t: "Read a local newspaper" },
+      { n: 643, t: "Watch the evening news" }, { n: 644, t: "Attend a nutrition class" },
+      { n: 645, t: "Create a new business name" }, { n: 646, t: "Take a tour of a health clinic" },
+      { n: 647, t: "Read an award-winning book" }, { n: 648, t: "Learn the different car parts" },
+      { n: 649, t: "Learn what carpe diem means" }, { n: 650, t: "Learn how to write a check" },
+      { n: 651, t: "Learn to create a budget" }, { n: 652, t: "Watch TV with closed captions" },
+      { n: 653, t: "Do deep breathing exercise" }, { n: 654, t: "Learn proper teeth brushing" },
+      { n: 655, t: "Compare 3 products & price" }, { n: 656, t: "Learn 5 healthy eating tips" },
+      { n: 657, t: "Watch a program on PBS" }, { n: 658, t: "Send the President a letter" },
+      { n: 659, t: "Open a savings account" }, { n: 660, t: "Use 10 sign language words" },
+      { n: 661, t: "Test your smoke detectors" }, { n: 662, t: "Practice spelling words" },
+      { n: 663, t: "Learn your squares (1x1...)" }, { n: 664, t: "Learn the national anthem" },
+      { n: 665, t: "Write a letter to the editor" }, { n: 666, t: "Learn to take temperature" },
       { n: 667, t: "Write a letter to an actor for an autograph" },
       { n: 668, t: "Write a letter to an athlete for an autograph" },
       { n: 669, t: "Write a letter to a local government official" },
@@ -518,60 +418,47 @@ const CATEGORIES = [
     ]
   },
   {
-    id: "smalljoy",
-    label: "Small Things, Great Joy",
-    range: [672, 726],
-    color: "#F1C40F",
-    emoji: "✨",
+    id: "smalljoy", label: "Small Things, Great Joy", range: [672, 726], color: "#F1C40F", emoji: "✨",
     items: [
       { n: 672, t: "Nap in a hammock" }, { n: 673, t: "Wear a crown" }, { n: 674, t: "Hold a newborn" },
-      { n: 675, t: "Babysit" }, { n: 676, t: "Get a 100% on something" },
-      { n: 677, t: "Collect seashells" }, { n: 678, t: "Take a bubble bath" },
-      { n: 679, t: "Wear a cowboy hat" }, { n: 680, t: "Learn a new hobby" },
+      { n: 675, t: "Babysit" }, { n: 676, t: "Get a 100% on something" }, { n: 677, t: "Collect seashells" },
+      { n: 678, t: "Take a bubble bath" }, { n: 679, t: "Wear a cowboy hat" }, { n: 680, t: "Learn a new hobby" },
       { n: 681, t: "Ride a ferris wheel" }, { n: 682, t: "Look at a full moon" },
-      { n: 683, t: "Ride an escalator" }, { n: 684, t: "Learn Pig Latin" },
-      { n: 685, t: "Help raise a flag" }, { n: 686, t: "Eat a snow cone" },
-      { n: 687, t: "Stay in PJs for a day" }, { n: 688, t: "Try a cornmaze" },
-      { n: 689, t: "Visit a masseuse" }, { n: 690, t: "Play in a sandbox" },
-      { n: 691, t: "Pop bubble wrap" }, { n: 692, t: "Test drive a cool car" },
-      { n: 693, t: "Build a sandcastle" }, { n: 694, t: "Swim in a hotel pool" },
-      { n: 695, t: "Try on a diamond ring" }, { n: 696, t: "Smell a baby's head" },
-      { n: 697, t: "Get a driver's license" }, { n: 698, t: "Make a time capsule" },
-      { n: 699, t: "Make a gratitude journal" }, { n: 700, t: "Draw your dream house" },
-      { n: 701, t: "Take an etiquette class" }, { n: 702, t: "Attend a local festival" },
-      { n: 703, t: "Compliment a stranger" }, { n: 704, t: "Get a manicure or pedicure" },
-      { n: 705, t: "Get dressed up for dinner" }, { n: 706, t: "Learn how to cartwheel" },
-      { n: 707, t: "Eat dessert first at 1 dinner" }, { n: 708, t: "Feel an unborn baby kick" },
-      { n: 709, t: "Attend a daytime parade" }, { n: 710, t: "Laugh until you cry" },
-      { n: 711, t: "Attend a nighttime parade" }, { n: 712, t: "Wear pearls or cufflinks" },
-      { n: 713, t: "Have an indoor picnic" }, { n: 714, t: "Have dinner by candlelight" },
-      { n: 715, t: "Open a new box of crayons" }, { n: 716, t: "Give up an item for 1 week" },
-      { n: 717, t: "Learn 7 Wonders of the World" }, { n: 718, t: "Spend a day in silence" },
-      { n: 719, t: "Swim in an outdoor pool" }, { n: 720, t: "Watch a TED Talk" },
-      { n: 721, t: "Build a living room tent" }, { n: 722, t: "Go on a walk with parents" },
-      { n: 723, t: "Lay a wreath on a VA grave" },
+      { n: 683, t: "Ride an escalator" }, { n: 684, t: "Learn Pig Latin" }, { n: 685, t: "Help raise a flag" },
+      { n: 686, t: "Eat a snow cone" }, { n: 687, t: "Stay in PJs for a day" }, { n: 688, t: "Try a cornmaze" },
+      { n: 689, t: "Visit a masseuse" }, { n: 690, t: "Play in a sandbox" }, { n: 691, t: "Pop bubble wrap" },
+      { n: 692, t: "Test drive a cool car" }, { n: 693, t: "Build a sandcastle" },
+      { n: 694, t: "Swim in a hotel pool" }, { n: 695, t: "Try on a diamond ring" },
+      { n: 696, t: "Smell a baby's head" }, { n: 697, t: "Get a driver's license" },
+      { n: 698, t: "Make a time capsule" }, { n: 699, t: "Make a gratitude journal" },
+      { n: 700, t: "Draw your dream house" }, { n: 701, t: "Take an etiquette class" },
+      { n: 702, t: "Attend a local festival" }, { n: 703, t: "Compliment a stranger" },
+      { n: 704, t: "Get a manicure or pedicure" }, { n: 705, t: "Get dressed up for dinner" },
+      { n: 706, t: "Learn how to cartwheel" }, { n: 707, t: "Eat dessert first at 1 dinner" },
+      { n: 708, t: "Feel an unborn baby kick" }, { n: 709, t: "Attend a daytime parade" },
+      { n: 710, t: "Laugh until you cry" }, { n: 711, t: "Attend a nighttime parade" },
+      { n: 712, t: "Wear pearls or cufflinks" }, { n: 713, t: "Have an indoor picnic" },
+      { n: 714, t: "Have dinner by candlelight" }, { n: 715, t: "Open a new box of crayons" },
+      { n: 716, t: "Give up an item for 1 week" }, { n: 717, t: "Learn 7 Wonders of the World" },
+      { n: 718, t: "Spend a day in silence" }, { n: 719, t: "Swim in an outdoor pool" },
+      { n: 720, t: "Watch a TED Talk" }, { n: 721, t: "Build a living room tent" },
+      { n: 722, t: "Go on a walk with parents" }, { n: 723, t: "Lay a wreath on a VA grave" },
       { n: 724, t: "Stay up until midnight on a summer night" },
       { n: 725, t: "Lay next to a baby on the floor to see their view" },
       { n: 726, t: "Make a wish on a dandelion gone to seed" },
     ]
   },
   {
-    id: "meetyou",
-    label: "Nice to Meet You",
-    range: [727, 748],
-    color: "#E74C3C",
-    emoji: "🤲",
+    id: "meetyou", label: "Nice to Meet You", range: [727, 748], color: "#E74C3C", emoji: "🤲",
     items: [
-      { n: 727, t: "Meet a 100-year-old" }, { n: 728, t: "Meet an author" },
-      { n: 729, t: "Meet a chief" }, { n: 730, t: "Meet a mayor" },
-      { n: 731, t: "Meet a firefighter" }, { n: 732, t: "Meet a veterinarian" },
+      { n: 727, t: "Meet a 100-year-old" }, { n: 728, t: "Meet an author" }, { n: 729, t: "Meet a chief" },
+      { n: 730, t: "Meet a mayor" }, { n: 731, t: "Meet a firefighter" }, { n: 732, t: "Meet a veterinarian" },
       { n: 733, t: "Meet a state senator" }, { n: 734, t: "Meet an Olympian" },
       { n: 735, t: "Meet a newscaster" }, { n: 736, t: "Meet a president" },
       { n: 737, t: "Learn your cashier's name" }, { n: 738, t: "Meet a marine biologist" },
       { n: 739, t: "Meet a college professor" }, { n: 740, t: "Meet a state representative" },
       { n: 741, t: "Add 5 people on Facebook" }, { n: 742, t: "Meet an ambidextrous person" },
-      { n: 743, t: "Visit nursing home residents" },
-      { n: 744, t: "Introduce yourself to someone new" },
+      { n: 743, t: "Visit nursing home residents" }, { n: 744, t: "Introduce yourself to someone new" },
       { n: 745, t: "Meet someone who can lick their elbow" },
       { n: 746, t: "Meet someone who can touch nose with tongue" },
       { n: 747, t: "Meet someone who can raise 1 eyebrow at a time" },
@@ -579,41 +466,35 @@ const CATEGORIES = [
     ]
   },
   {
-    id: "world",
-    label: "Destination: The World",
-    range: [749, 835],
-    color: "#2471A3",
-    emoji: "🌍",
+    id: "world", label: "Destination: The World", range: [749, 835], color: "#2471A3", emoji: "🌍",
     items: [
-      { n: 749, t: "Go to the 4-H fair" }, { n: 750, t: "Stay in a hotel" },
-      { n: 751, t: "Visit Illinois" }, { n: 752, t: "Ride in a limo" }, { n: 753, t: "Visit a farm" },
-      { n: 754, t: "Ride in a taxi" }, { n: 755, t: "Go to a prom" }, { n: 756, t: "Go to a zoo" },
-      { n: 757, t: "Visit Michigan" }, { n: 758, t: "Go to a play" }, { n: 759, t: "Go to a rodeo" },
-      { n: 760, t: "Take a hayride" }, { n: 761, t: "Go to an island" }, { n: 762, t: "Visit Kentucky" },
-      { n: 763, t: "Try geocaching" }, { n: 764, t: "Walk a labyrinth" },
-      { n: 765, t: "Plan a vacation" }, { n: 766, t: "Ride a city bus" },
-      { n: 767, t: "Eat at a mansion" }, { n: 768, t: "Visit a cave" },
-      { n: 769, t: "Ride in an elevator" }, { n: 770, t: "Visit Ohio" },
-      { n: 771, t: "Go to an aquarium" }, { n: 772, t: "Attend an auction" },
+      { n: 749, t: "Go to the 4-H fair" }, { n: 750, t: "Stay in a hotel" }, { n: 751, t: "Visit Illinois" },
+      { n: 752, t: "Ride in a limo" }, { n: 753, t: "Visit a farm" }, { n: 754, t: "Ride in a taxi" },
+      { n: 755, t: "Go to a prom" }, { n: 756, t: "Go to a zoo" }, { n: 757, t: "Visit Michigan" },
+      { n: 758, t: "Go to a play" }, { n: 759, t: "Go to a rodeo" }, { n: 760, t: "Take a hayride" },
+      { n: 761, t: "Go to an island" }, { n: 762, t: "Visit Kentucky" }, { n: 763, t: "Try geocaching" },
+      { n: 764, t: "Walk a labyrinth" }, { n: 765, t: "Plan a vacation" }, { n: 766, t: "Ride a city bus" },
+      { n: 767, t: "Eat at a mansion" }, { n: 768, t: "Visit a cave" }, { n: 769, t: "Ride in an elevator" },
+      { n: 770, t: "Visit Ohio" }, { n: 771, t: "Go to an aquarium" }, { n: 772, t: "Attend an auction" },
       { n: 773, t: "Tour city hall" }, { n: 774, t: "Visit state capital" },
       { n: 775, t: "Go on a factory tour" }, { n: 776, t: "Go on a homes tour" },
       { n: 777, t: "Go to a comedy show" }, { n: 778, t: "Tour the courthouse" },
       { n: 779, t: "Navigate using GPS" }, { n: 780, t: "Go to a go-kart race" },
       { n: 781, t: "Visit an apple orchard" }, { n: 782, t: "Shop at a resale store" },
-      { n: 783, t: "Visit a farmer's market" }, { n: 784, t: "Tour the YMCA" },
-      { n: 785, t: "Tour a jail" }, { n: 786, t: "Visit a local reservoir" },
-      { n: 787, t: "Visit a 5-star hotel lobby" }, { n: 788, t: "Watch a plane land" },
-      { n: 789, t: "Go to a planetarium" }, { n: 790, t: "Ride in a horse carriage" },
-      { n: 791, t: "Go to a haunted house" }, { n: 792, t: "Visit the James Dean Gallery" },
-      { n: 793, t: "Visit all local libraries" }, { n: 794, t: "Ride a merry-go-round" },
-      { n: 795, t: "Go to a potluck dinner" }, { n: 796, t: "Watch a plane take off" },
-      { n: 797, t: "Participate in a parade" }, { n: 798, t: "Play at Friendship Park" },
-      { n: 799, t: "Visit Washington, D.C." }, { n: 800, t: "Visit the state capital building" },
-      { n: 801, t: "Visit one of the Great Lakes" }, { n: 802, t: "Attend an antique car show" },
-      { n: 803, t: "Walk Monument Circle" }, { n: 804, t: "Go to a flea market" },
-      { n: 805, t: "Ride a kiddie ride at a mall" }, { n: 806, t: "Attend a city council meeting" },
-      { n: 807, t: "Walk a dog on the Riverwalk" }, { n: 808, t: "Attend Easter Pageant" },
-      { n: 809, t: "See a ribbon-cutting ceremony" }, { n: 810, t: "Take a culinary tour at Mississinewa 1812 festival" },
+      { n: 783, t: "Visit a farmer's market" }, { n: 784, t: "Tour the YMCA" }, { n: 785, t: "Tour a jail" },
+      { n: 786, t: "Visit a local reservoir" }, { n: 787, t: "Visit a 5-star hotel lobby" },
+      { n: 788, t: "Watch a plane land" }, { n: 789, t: "Go to a planetarium" },
+      { n: 790, t: "Ride in a horse carriage" }, { n: 791, t: "Go to a haunted house" },
+      { n: 792, t: "Visit the James Dean Gallery" }, { n: 793, t: "Visit all local libraries" },
+      { n: 794, t: "Ride a merry-go-round" }, { n: 795, t: "Go to a potluck dinner" },
+      { n: 796, t: "Watch a plane take off" }, { n: 797, t: "Participate in a parade" },
+      { n: 798, t: "Play at Friendship Park" }, { n: 799, t: "Visit Washington, D.C." },
+      { n: 800, t: "Visit the state capital building" }, { n: 801, t: "Visit one of the Great Lakes" },
+      { n: 802, t: "Attend an antique car show" }, { n: 803, t: "Walk Monument Circle" },
+      { n: 804, t: "Go to a flea market" }, { n: 805, t: "Ride a kiddie ride at a mall" },
+      { n: 806, t: "Attend a city council meeting" }, { n: 807, t: "Walk a dog on the Riverwalk" },
+      { n: 808, t: "Attend Easter Pageant" }, { n: 809, t: "See a ribbon-cutting ceremony" },
+      { n: 810, t: "Take a culinary tour at Mississinewa 1812 festival" },
       { n: 812, t: "Observe a court proceeding" }, { n: 813, t: "See local Veteran memorials" },
       { n: 814, t: "Attend a downtown festival" }, { n: 815, t: "Visit all the booths at a festival" },
       { n: 816, t: "Visit 9 neighboring counties" }, { n: 817, t: "Visit all Grant County towns" },
@@ -625,46 +506,36 @@ const CATEGORIES = [
       { n: 828, t: "Go to a homecoming football game" },
       { n: 829, t: "Learn about a place you'd like to visit" },
       { n: 830, t: "Walk across the Marion General walkway" },
-      { n: 831, t: "Color code a map of places you've been" },
-      { n: 832, t: "Attend a school board meeting" }, { n: 833, t: "See a palm tree" },
-      { n: 834, t: "Do genealogy at the library's Indiana Room" },
+      { n: 831, t: "Color code a map of places you've been" }, { n: 832, t: "Attend a school board meeting" },
+      { n: 833, t: "See a palm tree" }, { n: 834, t: "Do genealogy at the library's Indiana Room" },
       { n: 835, t: "Do a Chief Meshingomesia grave rubbing" },
     ]
   },
   {
-    id: "science",
-    label: "Science Lab",
-    range: [836, 862],
-    color: "#117A65",
-    emoji: "🔬",
+    id: "science", label: "Science Lab", range: [836, 862], color: "#117A65", emoji: "🔬",
     items: [
       { n: 836, t: "Milk a cow" }, { n: 837, t: "Learn CPR" }, { n: 838, t: "Plant a tree" },
       { n: 839, t: "See an eclipse" }, { n: 840, t: "Make playdough" }, { n: 841, t: "Find a fossil" },
       { n: 842, t: "Hike on a trail" }, { n: 843, t: "Use a telescope" }, { n: 844, t: "Listen to a cricket" },
-      { n: 845, t: "Plant a vegetable" }, { n: 846, t: "Use a microscope" },
-      { n: 847, t: "Make a bird feeder" }, { n: 848, t: "Raise a Chia Pet" },
-      { n: 849, t: "Find the North Star" }, { n: 850, t: "Mix Diet Coke & Mentos" },
-      { n: 851, t: "Make slime" }, { n: 852, t: "Care for a houseplant" },
-      { n: 853, t: "Make a leaf collection" }, { n: 854, t: "Collect chicken eggs" },
-      { n: 855, t: "Catch lightning bugs" }, { n: 856, t: "Watch a meteor shower" },
-      { n: 857, t: "Participate in the Science Fair" }, { n: 858, t: "Hold a (non-poisonous) snake" },
-      { n: 859, t: "Grow a flower from a seed" }, { n: 860, t: "Find North, South, East & West" },
+      { n: 845, t: "Plant a vegetable" }, { n: 846, t: "Use a microscope" }, { n: 847, t: "Make a bird feeder" },
+      { n: 848, t: "Raise a Chia Pet" }, { n: 849, t: "Find the North Star" },
+      { n: 850, t: "Mix Diet Coke & Mentos" }, { n: 851, t: "Make slime" },
+      { n: 852, t: "Care for a houseplant" }, { n: 853, t: "Make a leaf collection" },
+      { n: 854, t: "Collect chicken eggs" }, { n: 855, t: "Catch lightning bugs" },
+      { n: 856, t: "Watch a meteor shower" }, { n: 857, t: "Participate in the Science Fair" },
+      { n: 858, t: "Hold a (non-poisonous) snake" }, { n: 859, t: "Grow a flower from a seed" },
+      { n: 860, t: "Find North, South, East & West" },
       { n: 861, t: "Count seconds between lightning & thunder" },
       { n: 862, t: "Find the Big Dipper while stargazing" },
     ]
   },
   {
-    id: "random",
-    label: "That's So Random",
-    range: [863, 916],
-    color: "#922B21",
-    emoji: "🎯",
+    id: "random", label: "That's So Random", range: [863, 916], color: "#922B21", emoji: "🎯",
     items: [
       { n: 863, t: "Bob for apples" }, { n: 864, t: "Tell a joke" }, { n: 865, t: "Have a pillow fight" },
-      { n: 866, t: "Plank in public" }, { n: 867, t: "Listen for 2 minutes" },
-      { n: 868, t: "Get muddy" }, { n: 869, t: "Dress up a pet" }, { n: 870, t: "Ride in a VW Bug" },
-      { n: 871, t: "Learn a new word" }, { n: 872, t: "Lasso something" },
-      { n: 873, t: "Build with Legos" }, { n: 874, t: "Wear argyle socks" },
+      { n: 866, t: "Plank in public" }, { n: 867, t: "Listen for 2 minutes" }, { n: 868, t: "Get muddy" },
+      { n: 869, t: "Dress up a pet" }, { n: 870, t: "Ride in a VW Bug" }, { n: 871, t: "Learn a new word" },
+      { n: 872, t: "Lasso something" }, { n: 873, t: "Build with Legos" }, { n: 874, t: "Wear argyle socks" },
       { n: 875, t: "Learn military time" }, { n: 876, t: "Take a car ride in PJs" },
       { n: 877, t: "Organize a flashmob" }, { n: 878, t: "Organize a sock drawer" },
       { n: 879, t: "Learn how to tie a tie" }, { n: 880, t: "Find a doppelganger" },
@@ -685,23 +556,16 @@ const CATEGORIES = [
       { n: 909, t: "Make a holiday ornament" }, { n: 910, t: "Try a memory foam bed" },
       { n: 911, t: "Photograph a vanity plate" }, { n: 912, t: "Say: 'Quick, follow that car!'" },
       { n: 913, t: "Collect a penny from every year of your life" },
-      { n: 914, t: "Find a street named after someone you know" },
-      { n: 915, t: "Learn about Roy G. Biv" },
+      { n: 914, t: "Find a street named after someone you know" }, { n: 915, t: "Learn about Roy G. Biv" },
       { n: 916, t: "Reverse trick-or-treat: give your neighbors candy" },
     ]
   },
   {
-    id: "photo",
-    label: "Photo Opportunity",
-    range: [917, 961],
-    color: "#6C3483",
-    emoji: "📸",
+    id: "photo", label: "Photo Opportunity", range: [917, 961], color: "#6C3483", emoji: "📸",
     items: [
       { n: 917, t: "Take a picture of yourself every day for 30 days" },
-      { n: 918, t: "Get picture taken with a $100 bill" },
-      { n: 919, t: "Get picture taken on a tractor" },
-      { n: 920, t: "Get picture taken with a mentor" },
-      { n: 921, t: "Get picture taken in front of a castle" },
+      { n: 918, t: "Get picture taken with a $100 bill" }, { n: 919, t: "Get picture taken on a tractor" },
+      { n: 920, t: "Get picture taken with a mentor" }, { n: 921, t: "Get picture taken in front of a castle" },
       { n: 922, t: "Get picture taken with a superhero" },
       { n: 923, t: "Get picture taken in a 'Got milk' pose" },
       { n: 924, t: "Get picture taken with an LP record" },
@@ -726,8 +590,7 @@ const CATEGORIES = [
       { n: 945, t: "Take a picture of Johnny Law" }, { n: 946, t: "Take a picture of a sunset" },
       { n: 947, t: "Take a picture of a gargoyle" }, { n: 948, t: "Take a picture of the state bird" },
       { n: 949, t: "Take a picture of a 4-H fair queen" },
-      { n: 950, t: "Take a picture of an art sculpture" },
-      { n: 951, t: "Take a picture of a double rainbow" },
+      { n: 950, t: "Take a picture of an art sculpture" }, { n: 951, t: "Take a picture of a double rainbow" },
       { n: 952, t: "Take a picture of sidewalk chalk designs" },
       { n: 953, t: "Take a picture of the front of your house" },
       { n: 954, t: "Take a picture of your favorite sports team" },
@@ -741,29 +604,20 @@ const CATEGORIES = [
     ]
   },
   {
-    id: "dance",
-    label: "Shake It Up",
-    range: [962, 977],
-    color: "#D35400",
-    emoji: "💃",
+    id: "dance", label: "Shake It Up", range: [962, 977], color: "#D35400", emoji: "💃",
     items: [
-      { n: 962, t: "Do the chicken dance in public" },
-      { n: 963, t: "Do the Bunny Hop" }, { n: 964, t: "Go to a ballet" },
-      { n: 965, t: "Take a dance class" }, { n: 966, t: "Do the Cupid Shuffle" },
-      { n: 967, t: "Learn square dancing" }, { n: 968, t: "Do the Hokey Pokey" },
-      { n: 969, t: "Go to a school dance" }, { n: 970, t: "Perform the Macarena" },
-      { n: 971, t: "Learn or teach hip hop" }, { n: 972, t: "Learn or teach swing dancing" },
-      { n: 973, t: "Learn how to waltz or tango" }, { n: 974, t: "Learn or teach the cha-cha slide" },
-      { n: 975, t: "Learn or teach the electric slide" }, { n: 976, t: "Do the wave at a sports game" },
-      { n: 977, t: "Make up a dance move and show it to friends" },
+      { n: 962, t: "Do the chicken dance in public" }, { n: 963, t: "Do the Bunny Hop" },
+      { n: 964, t: "Go to a ballet" }, { n: 965, t: "Take a dance class" },
+      { n: 966, t: "Do the Cupid Shuffle" }, { n: 967, t: "Learn square dancing" },
+      { n: 968, t: "Do the Hokey Pokey" }, { n: 969, t: "Go to a school dance" },
+      { n: 970, t: "Perform the Macarena" }, { n: 971, t: "Learn or teach hip hop" },
+      { n: 972, t: "Learn or teach swing dancing" }, { n: 973, t: "Learn how to waltz or tango" },
+      { n: 974, t: "Learn or teach the cha-cha slide" }, { n: 975, t: "Learn or teach the electric slide" },
+      { n: 976, t: "Do the wave at a sports game" }, { n: 977, t: "Make up a dance move and show it to friends" },
     ]
   },
   {
-    id: "family",
-    label: "We Are Family",
-    range: [978, 1000],
-    color: "#884EA0",
-    emoji: "👨‍👩‍👧‍👦",
+    id: "family", label: "We Are Family", range: [978, 1000], color: "#884EA0", emoji: "👨‍👩‍👧‍👦",
     items: [
       { n: 978, t: "Rent a family movie" }, { n: 979, t: "Create a family tree" },
       { n: 980, t: "Eat a family meal" }, { n: 981, t: "Take a family photo" },
@@ -772,8 +626,7 @@ const CATEGORIES = [
       { n: 986, t: "Create a family coat of arms" }, { n: 987, t: "Visit where a relative grew up" },
       { n: 988, t: "Make a family money 'fun' jar" }, { n: 989, t: "Plant a garden with your family" },
       { n: 990, t: "Spend an evening with your family" }, { n: 991, t: "Have lunch at school with a parent" },
-      { n: 992, t: "Write a letter to a family member" },
-      { n: 993, t: "Eat a meal with three generations" },
+      { n: 992, t: "Write a letter to a family member" }, { n: 993, t: "Eat a meal with three generations" },
       { n: 994, t: "Say, 'I love you' to a family member" },
       { n: 995, t: "Build a birdhouse with your family" },
       { n: 996, t: "Start a board game night with your family" },
@@ -785,13 +638,13 @@ const CATEGORIES = [
   },
 ];
 
-const STORAGE_KEY = "grantco_passport_v1";
+const STORAGE_KEY = "grantco_passport_v2";
 
 function loadData() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : { checked: {}, name: "", school: "", started: "", dream: "" };
-  } catch { return { checked: {}, name: "", school: "", started: "", dream: "" }; }
+    return raw ? JSON.parse(raw) : { checked: {}, signoffs: {}, name: "", school: "", started: "", dream: "" };
+  } catch { return { checked: {}, signoffs: {}, name: "", school: "", started: "", dream: "" }; }
 }
 function saveData(d) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); } catch {}
@@ -800,10 +653,17 @@ function saveData(d) {
 // ─── MAIN APP ─────────────────────────────────────────────────────────────────
 export default function PassportApp() {
   const [data, setData] = useState(loadData);
-  const [view, setView] = useState("home"); // home | category | search | profile
+  const [view, setView] = useState("home");
   const [activeCat, setActiveCat] = useState(null);
   const [search, setSearch] = useState("");
   const [confetti, setConfetti] = useState(false);
+  // Sign-off modal state
+  const [signoffModal, setSignoffModal] = useState(null); // { catId }
+  const [signoffName, setSignoffName] = useState("");
+  const [signoffRelation, setSignoffRelation] = useState("");
+  const [signoffPin, setSignoffPin] = useState("");
+  const [signoffError, setSignoffError] = useState("");
+  const [signoffSuccess, setSignoffSuccess] = useState(false);
 
   const totalChecked = useMemo(() => Object.values(data.checked).filter(Boolean).length, [data.checked]);
   const pct = Math.round((totalChecked / 1000) * 100);
@@ -813,13 +673,59 @@ export default function PassportApp() {
   function toggle(n) {
     const next = { ...data, checked: { ...data.checked, [n]: !data.checked[n] } };
     setData(next);
-    const newCount = Object.values(next.checked).filter(Boolean).length;
-    if (newCount === 1000) setConfetti(true);
+    if (Object.values(next.checked).filter(Boolean).length === 1000) setConfetti(true);
   }
 
   function updateProfile(field, val) {
     setData(d => ({ ...d, [field]: val }));
   }
+
+  // ── Sign-off logic ──────────────────────────────────────────────────────────
+  // PIN is last 4 digits of adult's name length * experiences completed (simple, no server needed)
+  // We just require a name + relation + a 4-digit confirmation code they type themselves.
+  // The "PIN" is simply typed twice to confirm intent — this is a trust-based system, not cryptographic.
+  function openSignoff(catId) {
+    setSignoffModal({ catId });
+    setSignoffName("");
+    setSignoffRelation("");
+    setSignoffPin("");
+    setSignoffError("");
+    setSignoffSuccess(false);
+  }
+
+  function submitSignoff() {
+    if (!signoffName.trim()) { setSignoffError("Please enter your name."); return; }
+    if (!signoffRelation.trim()) { setSignoffError("Please enter your relationship to the student."); return; }
+    if (signoffPin.length < 4) { setSignoffError("Please enter a 4-digit confirmation code."); return; }
+
+    const cat = CATEGORIES.find(c => c.id === signoffModal.catId);
+    const done = cat.items.filter(i => data.checked[i.n]).length;
+    if (done < cat.items.length) {
+      setSignoffError(`All ${cat.items.length} experiences in this category must be checked off before signing.`);
+      return;
+    }
+
+    const signoff = {
+      adultName: signoffName.trim(),
+      relation: signoffRelation.trim(),
+      date: new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
+      timestamp: Date.now(),
+    };
+    setData(d => ({ ...d, signoffs: { ...d.signoffs, [signoffModal.catId]: signoff } }));
+    setSignoffSuccess(true);
+    setTimeout(() => { setSignoffModal(null); setSignoffSuccess(false); }, 2200);
+  }
+
+  function removeSignoff(catId) {
+    if (!window.confirm("Remove this sign-off? The adult will need to sign again.")) return;
+    setData(d => {
+      const s = { ...d.signoffs };
+      delete s[catId];
+      return { ...d, signoffs: s };
+    });
+  }
+
+  const signedCount = Object.keys(data.signoffs).length;
 
   const searchResults = useMemo(() => {
     if (!search.trim()) return [];
@@ -830,19 +736,27 @@ export default function PassportApp() {
     );
   }, [search]);
 
-  // ── Home ──
+  // ── Home ────────────────────────────────────────────────────────────────────
   if (view === "home") {
     return (
-      <div style={{ minHeight: "100vh", background: "#F7F4EF", fontFamily: "'Georgia', serif" }}>
+      <div style={{ minHeight: "100vh", background: "#F7F4EF", fontFamily: "'Georgia', serif", paddingBottom: 80 }}>
         <ConfettiOverlay show={confetti} onDone={() => setConfetti(false)} />
+        <SignoffModal
+          open={!!signoffModal}
+          catId={signoffModal?.catId}
+          name={signoffName} setName={setSignoffName}
+          relation={signoffRelation} setRelation={setSignoffRelation}
+          pin={signoffPin} setPin={setSignoffPin}
+          error={signoffError} success={signoffSuccess}
+          onSubmit={submitSignoff}
+          onClose={() => setSignoffModal(null)}
+          data={data}
+        />
+
         {/* Header */}
         <div style={{
           background: "linear-gradient(135deg, #1B4B3A 0%, #2D7A56 60%, #4A9B6F 100%)",
-          padding: "32px 20px 28px",
-          textAlign: "center",
-          color: "#fff",
-          position: "relative",
-          overflow: "hidden",
+          padding: "32px 20px 28px", textAlign: "center", color: "#fff",
         }}>
           <div style={{ fontSize: 11, letterSpacing: 4, textTransform: "uppercase", opacity: 0.7, marginBottom: 6 }}>
             Grant County, Indiana
@@ -851,112 +765,94 @@ export default function PassportApp() {
             1,000 Things to Do
           </h1>
           <div style={{ fontSize: 14, opacity: 0.8, marginTop: 4 }}>Before You Graduate</div>
-
-          {data.name && (
-            <div style={{ marginTop: 14, fontSize: 15, opacity: 0.9 }}>
-              Welcome back, <strong>{data.name}</strong> ✦
-            </div>
-          )}
-
-          {/* Big progress ring */}
+          {data.name && <div style={{ marginTop: 14, fontSize: 15, opacity: 0.9 }}>Welcome back, <strong>{data.name}</strong> ✦</div>}
           <div style={{ margin: "20px auto 0", display: "flex", justifyContent: "center" }}>
             <ProgressRing pct={pct} count={totalChecked} />
+          </div>
+          {/* Sign-off summary pill */}
+          <div style={{ marginTop: 14, display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,.15)", borderRadius: 20, padding: "5px 14px", fontSize: 13 }}>
+            <span>✍️</span>
+            <span>{signedCount} of {CATEGORIES.length} categories signed off</span>
           </div>
         </div>
 
         {/* Nav pills */}
         <div style={{ display: "flex", gap: 8, padding: "16px 16px 0", overflowX: "auto" }}>
-          {[
-            { label: "🏠 Home", id: "home" },
-            { label: "🔍 Search", id: "search" },
-            { label: "👤 Profile", id: "profile" },
-          ].map(n => (
-            <button key={n.id} onClick={() => setView(n.id)}
-              style={{
-                flex: "none", padding: "7px 16px", borderRadius: 20, border: "none",
-                background: view === n.id ? "#1B4B3A" : "#E8E4DC",
-                color: view === n.id ? "#fff" : "#333",
-                fontFamily: "inherit", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap",
-              }}>
-              {n.label}
-            </button>
+          {[{ label: "🏠 Home", id: "home" }, { label: "🔍 Search", id: "search" }, { label: "👤 Profile", id: "profile" }].map(n => (
+            <button key={n.id} onClick={() => setView(n.id)} style={{
+              flex: "none", padding: "7px 16px", borderRadius: 20, border: "none",
+              background: view === n.id ? "#1B4B3A" : "#E8E4DC",
+              color: view === n.id ? "#fff" : "#333",
+              fontFamily: "inherit", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap",
+            }}>{n.label}</button>
           ))}
         </div>
 
         {/* Category grid */}
         <div style={{ padding: "16px" }}>
-          <div style={{ fontSize: 12, letterSpacing: 2, textTransform: "uppercase", color: "#888", marginBottom: 12 }}>
-            Categories
-          </div>
+          <div style={{ fontSize: 12, letterSpacing: 2, textTransform: "uppercase", color: "#888", marginBottom: 12 }}>Categories</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(155px, 1fr))", gap: 10 }}>
             {CATEGORIES.map(cat => {
               const done = cat.items.filter(i => data.checked[i.n]).length;
               const total = cat.items.length;
               const catPct = Math.round((done / total) * 100);
+              const signed = !!data.signoffs[cat.id];
               return (
                 <button key={cat.id} onClick={() => { setActiveCat(cat.id); setView("category"); }}
                   style={{
-                    background: "#fff", border: `2px solid ${cat.color}20`,
+                    background: "#fff", border: `2px solid ${signed ? cat.color + "80" : cat.color + "20"}`,
                     borderRadius: 12, padding: "14px 12px", cursor: "pointer",
                     textAlign: "left", transition: "box-shadow .15s",
-                    boxShadow: "0 1px 4px rgba(0,0,0,.06)",
+                    boxShadow: signed ? `0 2px 10px ${cat.color}25` : "0 1px 4px rgba(0,0,0,.06)",
+                    position: "relative",
                   }}
                   onMouseEnter={e => e.currentTarget.style.boxShadow = `0 4px 16px ${cat.color}30`}
-                  onMouseLeave={e => e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,.06)"}
+                  onMouseLeave={e => e.currentTarget.style.boxShadow = signed ? `0 2px 10px ${cat.color}25` : "0 1px 4px rgba(0,0,0,.06)"}
                 >
+                  {signed && (
+                    <div style={{ position: "absolute", top: 8, right: 8, fontSize: 14 }} title="Signed off by adult">✅</div>
+                  )}
                   <div style={{ fontSize: 22, marginBottom: 6 }}>{cat.emoji}</div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "#222", lineHeight: 1.3, marginBottom: 8 }}>
-                    {cat.label}
-                  </div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "#222", lineHeight: 1.3, marginBottom: 8 }}>{cat.label}</div>
                   <div style={{ background: "#F0EDE8", borderRadius: 4, height: 5, overflow: "hidden" }}>
                     <div style={{ width: `${catPct}%`, height: "100%", background: cat.color, borderRadius: 4, transition: "width .4s" }} />
                   </div>
                   <div style={{ fontSize: 11, color: "#888", marginTop: 4 }}>{done}/{total}</div>
+                  {signed && (
+                    <div style={{ fontSize: 10, color: cat.color, marginTop: 3, fontWeight: 600 }}>
+                      Signed by {data.signoffs[cat.id].adultName}
+                    </div>
+                  )}
                 </button>
               );
             })}
           </div>
         </div>
-
-        {/* Footer */}
         <div style={{ textAlign: "center", padding: "24px 16px", color: "#aaa", fontSize: 11 }}>
           Project Leadership · Grant County, Indiana · Copyright © 2021
         </div>
+        <BottomNav view={view} setView={setView} />
       </div>
     );
   }
 
-  // ── Search ──
+  // ── Search ──────────────────────────────────────────────────────────────────
   if (view === "search") {
     return (
-      <div style={{ minHeight: "100vh", background: "#F7F4EF", fontFamily: "'Georgia', serif" }}>
+      <div style={{ minHeight: "100vh", background: "#F7F4EF", fontFamily: "'Georgia', serif", paddingBottom: 80 }}>
         <TopBar onBack={() => setView("home")} title="Search Experiences" />
         <div style={{ padding: 16 }}>
-          <input
-            autoFocus
-            value={search}
-            onChange={e => setSearch(e.target.value)}
+          <input autoFocus value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Search 1,000 experiences…"
-            style={{
-              width: "100%", boxSizing: "border-box", padding: "12px 16px",
-              borderRadius: 10, border: "2px solid #DDD", fontSize: 15,
-              fontFamily: "inherit", outline: "none",
-            }}
-          />
-          {search && (
-            <div style={{ marginTop: 12, color: "#888", fontSize: 12 }}>
-              {searchResults.length} result{searchResults.length !== 1 ? "s" : ""}
-            </div>
-          )}
+            style={{ width: "100%", boxSizing: "border-box", padding: "12px 16px", borderRadius: 10, border: "2px solid #DDD", fontSize: 15, fontFamily: "inherit", outline: "none" }} />
+          {search && <div style={{ marginTop: 12, color: "#888", fontSize: 12 }}>{searchResults.length} result{searchResults.length !== 1 ? "s" : ""}</div>}
           <div style={{ marginTop: 8 }}>
             {searchResults.map(it => (
               <ExperienceRow key={it.n} item={it} checked={!!data.checked[it.n]} onToggle={() => toggle(it.n)}
                 accent={it.cat.color} sub={`#${it.n} · ${it.cat.label}`} />
             ))}
             {search && searchResults.length === 0 && (
-              <div style={{ textAlign: "center", padding: 40, color: "#aaa" }}>
-                No experiences found for "{search}"
-              </div>
+              <div style={{ textAlign: "center", padding: 40, color: "#aaa" }}>No experiences found for "{search}"</div>
             )}
           </div>
         </div>
@@ -965,16 +861,14 @@ export default function PassportApp() {
     );
   }
 
-  // ── Profile ──
+  // ── Profile ─────────────────────────────────────────────────────────────────
   if (view === "profile") {
     return (
       <div style={{ minHeight: "100vh", background: "#F7F4EF", fontFamily: "'Georgia', serif", paddingBottom: 80 }}>
         <TopBar onBack={() => setView("home")} title="My Passport" />
         <div style={{ padding: 16 }}>
           <div style={{ background: "#fff", borderRadius: 14, padding: 20, boxShadow: "0 1px 6px rgba(0,0,0,.06)" }}>
-            <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 2, color: "#888", marginBottom: 16 }}>
-              About Me
-            </div>
+            <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 2, color: "#888", marginBottom: 16 }}>About Me</div>
             {[
               { key: "name", label: "Your Name", placeholder: "Enter your name" },
               { key: "school", label: "School", placeholder: "Your school name" },
@@ -983,46 +877,66 @@ export default function PassportApp() {
             ].map(f => (
               <div key={f.key} style={{ marginBottom: 14 }}>
                 <label style={{ display: "block", fontSize: 12, color: "#555", marginBottom: 4 }}>{f.label}</label>
-                <input
-                  type={f.type || "text"}
-                  value={data[f.key] || ""}
-                  onChange={e => updateProfile(f.key, e.target.value)}
+                <input type={f.type || "text"} value={data[f.key] || ""} onChange={e => updateProfile(f.key, e.target.value)}
                   placeholder={f.placeholder}
-                  style={{
-                    width: "100%", boxSizing: "border-box", padding: "10px 12px",
-                    borderRadius: 8, border: "1.5px solid #E0DDD8", fontSize: 14,
-                    fontFamily: "inherit",
-                  }}
-                />
+                  style={{ width: "100%", boxSizing: "border-box", padding: "10px 12px", borderRadius: 8, border: "1.5px solid #E0DDD8", fontSize: 14, fontFamily: "inherit" }} />
               </div>
             ))}
           </div>
 
-          {/* Stats */}
+          {/* Sign-off summary card */}
           <div style={{ marginTop: 16, background: "#fff", borderRadius: 14, padding: 20, boxShadow: "0 1px 6px rgba(0,0,0,.06)" }}>
             <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 2, color: "#888", marginBottom: 14 }}>
-              My Progress
+              Adult Sign-Offs
             </div>
+            <div style={{ fontSize: 13, color: "#555", marginBottom: 14, lineHeight: 1.5 }}>
+              {signedCount === 0
+                ? "No categories have been signed off yet. Complete all experiences in a category, then ask a trusted adult to sign."
+                : `${signedCount} of ${CATEGORIES.length} categories have been approved by a trusted adult.`}
+            </div>
+            {CATEGORIES.filter(c => data.signoffs[c.id]).map(cat => {
+              const s = data.signoffs[cat.id];
+              return (
+                <div key={cat.id} style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                  padding: "10px 12px", background: `${cat.color}10`, borderRadius: 10,
+                  border: `1.5px solid ${cat.color}30`, marginBottom: 8,
+                }}>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#222" }}>{cat.emoji} {cat.label}</div>
+                    <div style={{ fontSize: 11, color: "#666", marginTop: 2 }}>
+                      Signed by <strong>{s.adultName}</strong> ({s.relation}) · {s.date}
+                    </div>
+                  </div>
+                  <button onClick={() => removeSignoff(cat.id)} title="Remove sign-off"
+                    style={{ background: "none", border: "none", color: "#C0392B", fontSize: 16, cursor: "pointer", padding: 4 }}>✕</button>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Stats */}
+          <div style={{ marginTop: 16, background: "#fff", borderRadius: 14, padding: 20, boxShadow: "0 1px 6px rgba(0,0,0,.06)" }}>
+            <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 2, color: "#888", marginBottom: 14 }}>My Progress</div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <StatCard label="Completed" value={totalChecked} color="#2D7A56" />
               <StatCard label="Remaining" value={1000 - totalChecked} color="#C05C1A" />
               <StatCard label="Percent Done" value={`${pct}%`} color="#7B5EA7" />
-              <StatCard label="Categories" value={`${CATEGORIES.filter(c => c.items.some(i => data.checked[i.n])).length}/${CATEGORIES.length}`} color="#2980B9" />
+              <StatCard label="Signed Off" value={`${signedCount}/${CATEGORIES.length}`} color="#2980B9" />
             </div>
           </div>
 
           {/* Category breakdown */}
           <div style={{ marginTop: 16, background: "#fff", borderRadius: 14, padding: 20, boxShadow: "0 1px 6px rgba(0,0,0,.06)" }}>
-            <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 2, color: "#888", marginBottom: 14 }}>
-              By Category
-            </div>
+            <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 2, color: "#888", marginBottom: 14 }}>By Category</div>
             {CATEGORIES.map(cat => {
               const done = cat.items.filter(i => data.checked[i.n]).length;
               const catPct = Math.round((done / cat.items.length) * 100);
+              const signed = !!data.signoffs[cat.id];
               return (
                 <div key={cat.id} style={{ marginBottom: 10 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 3 }}>
-                    <span>{cat.emoji} {cat.label}</span>
+                    <span>{cat.emoji} {cat.label} {signed ? "✅" : ""}</span>
                     <span style={{ color: "#888" }}>{done}/{cat.items.length}</span>
                   </div>
                   <div style={{ background: "#F0EDE8", borderRadius: 4, height: 6 }}>
@@ -1033,17 +947,11 @@ export default function PassportApp() {
             })}
           </div>
 
-          <button
-            onClick={() => {
-              if (window.confirm("Reset all your progress? This cannot be undone.")) {
-                setData({ checked: {}, name: data.name, school: data.school, started: data.started, dream: data.dream });
-              }
-            }}
-            style={{
-              marginTop: 16, width: "100%", padding: "12px", background: "transparent",
-              border: "1.5px solid #E0DDD8", borderRadius: 10, color: "#C0392B",
-              fontFamily: "inherit", fontSize: 14, cursor: "pointer",
-            }}>
+          <button onClick={() => {
+            if (window.confirm("Reset all your progress and sign-offs? This cannot be undone.")) {
+              setData({ checked: {}, signoffs: {}, name: data.name, school: data.school, started: data.started, dream: data.dream });
+            }
+          }} style={{ marginTop: 16, width: "100%", padding: "12px", background: "transparent", border: "1.5px solid #E0DDD8", borderRadius: 10, color: "#C0392B", fontFamily: "inherit", fontSize: 14, cursor: "pointer" }}>
             Reset All Progress
           </button>
         </div>
@@ -1052,42 +960,94 @@ export default function PassportApp() {
     );
   }
 
-  // ── Category ──
+  // ── Category ─────────────────────────────────────────────────────────────────
   if (view === "category" && activeCat) {
     const cat = CATEGORIES.find(c => c.id === activeCat);
     if (!cat) return null;
     const done = cat.items.filter(i => data.checked[i.n]).length;
-    const catPct = Math.round((done / cat.items.length) * 100);
+    const total = cat.items.length;
+    const catPct = Math.round((done / total) * 100);
+    const allDone = done === total;
+    const signed = data.signoffs[cat.id];
 
     return (
       <div style={{ minHeight: "100vh", background: "#F7F4EF", fontFamily: "'Georgia', serif", paddingBottom: 80 }}>
+        <SignoffModal
+          open={!!signoffModal}
+          catId={signoffModal?.catId}
+          name={signoffName} setName={setSignoffName}
+          relation={signoffRelation} setRelation={setSignoffRelation}
+          pin={signoffPin} setPin={setSignoffPin}
+          error={signoffError} success={signoffSuccess}
+          onSubmit={submitSignoff}
+          onClose={() => setSignoffModal(null)}
+          data={data}
+        />
+
+        {/* Category header */}
         <div style={{ background: cat.color, padding: "24px 16px 20px", color: "#fff" }}>
           <button onClick={() => setView("home")} style={{ background: "none", border: "none", color: "#fff", fontSize: 22, cursor: "pointer", padding: 0, marginBottom: 8 }}>←</button>
           <div style={{ fontSize: 30, marginBottom: 4 }}>{cat.emoji}</div>
           <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>{cat.label}</h2>
-          <div style={{ fontSize: 13, opacity: 0.85, marginTop: 2 }}>
-            Experiences {cat.range[0]}–{cat.range[1]}
-          </div>
+          <div style={{ fontSize: 13, opacity: 0.85, marginTop: 2 }}>Experiences {cat.range[0]}–{cat.range[1]}</div>
           <div style={{ marginTop: 12, background: "rgba(255,255,255,.25)", borderRadius: 6, height: 8 }}>
             <div style={{ width: `${catPct}%`, height: "100%", background: "#fff", borderRadius: 6, transition: "width .4s" }} />
           </div>
-          <div style={{ fontSize: 12, marginTop: 5, opacity: 0.9 }}>{done} of {cat.items.length} completed</div>
+          <div style={{ fontSize: 12, marginTop: 5, opacity: 0.9 }}>{done} of {total} completed</div>
         </div>
 
-        {/* Quick check-all buttons */}
+        {/* Sign-off banner — shown when all done */}
+        {allDone && !signed && (
+          <div style={{
+            margin: "14px 16px 0",
+            background: "linear-gradient(135deg, #1B4B3A, #2D7A56)",
+            borderRadius: 12, padding: "16px", color: "#fff",
+            display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
+          }}>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 14 }}>🎉 All done! Ready for sign-off.</div>
+              <div style={{ fontSize: 12, opacity: 0.85, marginTop: 3 }}>Hand the phone to a trusted adult to approve this category.</div>
+            </div>
+            <button onClick={() => openSignoff(cat.id)}
+              style={{ background: "#fff", color: "#1B4B3A", border: "none", borderRadius: 8, padding: "8px 14px", fontFamily: "inherit", fontSize: 13, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>
+              Sign Off
+            </button>
+          </div>
+        )}
+
+        {/* Signed banner */}
+        {signed && (
+          <div style={{
+            margin: "14px 16px 0", background: "#fff", borderRadius: 12, padding: "14px 16px",
+            border: `2px solid ${cat.color}50`, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10,
+          }}>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 14, color: "#1B4B3A" }}>✅ Approved by {signed.adultName}</div>
+              <div style={{ fontSize: 11, color: "#666", marginTop: 2 }}>{signed.relation} · {signed.date}</div>
+            </div>
+            <button onClick={() => removeSignoff(cat.id)}
+              style={{ background: "none", border: "1px solid #DDD", borderRadius: 6, padding: "5px 10px", color: "#888", fontFamily: "inherit", fontSize: 11, cursor: "pointer" }}>
+              Remove
+            </button>
+          </div>
+        )}
+
+        {/* Check all / uncheck all */}
         <div style={{ padding: "12px 16px 0", display: "flex", gap: 8 }}>
           <button onClick={() => {
             const allChecked = cat.items.every(i => data.checked[i.n]);
             const updates = {};
             cat.items.forEach(i => { updates[i.n] = !allChecked; });
             setData(d => ({ ...d, checked: { ...d.checked, ...updates } }));
-          }}
-            style={{
-              flex: 1, padding: "8px", borderRadius: 8, border: `1.5px solid ${cat.color}`,
-              background: "transparent", color: cat.color, fontFamily: "inherit", fontSize: 13, cursor: "pointer",
-            }}>
+          }} style={{ flex: 1, padding: "8px", borderRadius: 8, border: `1.5px solid ${cat.color}`, background: "transparent", color: cat.color, fontFamily: "inherit", fontSize: 13, cursor: "pointer" }}>
             {cat.items.every(i => data.checked[i.n]) ? "Uncheck All" : "Check All"}
           </button>
+          {allDone && !signed && (
+            <button onClick={() => openSignoff(cat.id)}
+              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: cat.color, color: "#fff", fontFamily: "inherit", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+              ✍️ Get Sign-Off
+            </button>
+          )}
         </div>
 
         <div style={{ padding: "12px 16px" }}>
@@ -1104,8 +1064,98 @@ export default function PassportApp() {
   return null;
 }
 
-// ─── SUB-COMPONENTS ───────────────────────────────────────────────────────────
+// ─── SIGN-OFF MODAL ───────────────────────────────────────────────────────────
+function SignoffModal({ open, catId, name, setName, relation, setRelation, pin, setPin, error, success, onSubmit, onClose, data }) {
+  if (!open) return null;
+  const cat = CATEGORIES.find(c => c.id === catId);
+  const done = cat ? cat.items.filter(i => data.checked[i.n]).length : 0;
+  const total = cat ? cat.items.length : 0;
 
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,.55)",
+      display: "flex", alignItems: "flex-end", justifyContent: "center",
+    }} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+      <div style={{
+        background: "#fff", borderRadius: "20px 20px 0 0", padding: "24px 20px 36px",
+        width: "100%", maxWidth: 500, boxSizing: "border-box",
+        animation: "slideUp .25s ease",
+      }}>
+        <style>{`@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }`}</style>
+
+        {success ? (
+          <div style={{ textAlign: "center", padding: "24px 0" }}>
+            <div style={{ fontSize: 52 }}>✅</div>
+            <div style={{ fontSize: 20, fontWeight: 700, marginTop: 12, color: "#1B4B3A" }}>Signed!</div>
+            <div style={{ fontSize: 14, color: "#666", marginTop: 6 }}>This category is now approved.</div>
+          </div>
+        ) : (
+          <>
+            {/* Header */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 18 }}>
+              <div>
+                <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 2, color: "#888" }}>Adult Sign-Off</div>
+                <div style={{ fontSize: 18, fontWeight: 700, marginTop: 2 }}>{cat?.emoji} {cat?.label}</div>
+                <div style={{ fontSize: 12, color: "#888", marginTop: 2 }}>{done} of {total} experiences completed</div>
+              </div>
+              <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "#aaa", padding: 0 }}>✕</button>
+            </div>
+
+            {/* Instruction */}
+            <div style={{ background: "#F0F7F4", borderRadius: 10, padding: "12px 14px", marginBottom: 16, fontSize: 13, color: "#2D5A47", lineHeight: 1.5 }}>
+              <strong>For the trusted adult:</strong> Please review this student's completed experiences and sign below to confirm you witnessed or are aware of their participation.
+            </div>
+
+            {/* Fields */}
+            {[
+              { label: "Your full name", value: name, set: setName, placeholder: "e.g. Maria Johnson" },
+              { label: "Your relationship to the student", value: relation, set: setRelation, placeholder: "e.g. Parent, Teacher, Mentor" },
+            ].map(f => (
+              <div key={f.label} style={{ marginBottom: 14 }}>
+                <label style={{ display: "block", fontSize: 12, color: "#555", marginBottom: 4 }}>{f.label}</label>
+                <input value={f.value} onChange={e => f.set(e.target.value)} placeholder={f.placeholder}
+                  style={{ width: "100%", boxSizing: "border-box", padding: "10px 12px", borderRadius: 8, border: "1.5px solid #E0DDD8", fontSize: 14, fontFamily: "inherit" }} />
+              </div>
+            ))}
+
+            {/* Confirmation code */}
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ display: "block", fontSize: 12, color: "#555", marginBottom: 4 }}>
+                Create a 4-digit confirmation code
+                <span style={{ color: "#999", fontWeight: 400 }}> (you'll need this if changes are ever disputed)</span>
+              </label>
+              <input
+                value={pin} onChange={e => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                placeholder="e.g. 4729" inputMode="numeric" maxLength={4}
+                style={{ width: "100%", boxSizing: "border-box", padding: "10px 12px", borderRadius: 8, border: "1.5px solid #E0DDD8", fontSize: 18, letterSpacing: 8, fontFamily: "inherit", textAlign: "center" }}
+              />
+            </div>
+
+            {error && (
+              <div style={{ background: "#FEF0F0", border: "1px solid #FACACA", borderRadius: 8, padding: "10px 12px", fontSize: 13, color: "#C0392B", marginBottom: 14 }}>
+                {error}
+              </div>
+            )}
+
+            <button onClick={onSubmit} style={{
+              width: "100%", padding: "14px", borderRadius: 10, border: "none",
+              background: "linear-gradient(135deg, #1B4B3A, #2D7A56)",
+              color: "#fff", fontFamily: "inherit", fontSize: 16, fontWeight: 700, cursor: "pointer",
+            }}>
+              ✍️ Approve & Sign
+            </button>
+
+            <div style={{ fontSize: 11, color: "#aaa", textAlign: "center", marginTop: 10, lineHeight: 1.4 }}>
+              By signing, you confirm you are a trusted adult and that this student has completed the experiences in this category to the best of your knowledge.
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── SHARED COMPONENTS ────────────────────────────────────────────────────────
 function ProgressRing({ pct, count }) {
   const r = 52, circ = 2 * Math.PI * r;
   const dash = (pct / 100) * circ;
@@ -1127,14 +1177,11 @@ function ProgressRing({ pct, count }) {
 
 function ExperienceRow({ item, checked, onToggle, accent, sub }) {
   return (
-    <div onClick={onToggle}
-      style={{
-        display: "flex", alignItems: "flex-start", gap: 12, padding: "12px 14px",
-        background: checked ? `${accent}12` : "#fff",
-        borderRadius: 10, marginBottom: 7, cursor: "pointer",
-        border: `1.5px solid ${checked ? accent + "40" : "#E8E4DC"}`,
-        transition: "background .15s, border .15s",
-      }}>
+    <div onClick={onToggle} style={{
+      display: "flex", alignItems: "flex-start", gap: 12, padding: "12px 14px",
+      background: checked ? `${accent}12` : "#fff", borderRadius: 10, marginBottom: 7, cursor: "pointer",
+      border: `1.5px solid ${checked ? accent + "40" : "#E8E4DC"}`, transition: "background .15s, border .15s",
+    }}>
       <div style={{
         width: 24, height: 24, minWidth: 24, borderRadius: 6,
         border: `2px solid ${checked ? accent : "#CCC"}`,
@@ -1165,23 +1212,14 @@ function TopBar({ onBack, title }) {
 }
 
 function BottomNav({ view, setView }) {
-  const items = [
-    { id: "home", icon: "🏠", label: "Home" },
-    { id: "search", icon: "🔍", label: "Search" },
-    { id: "profile", icon: "📊", label: "My Stats" },
-  ];
   return (
-    <div style={{
-      position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff",
-      borderTop: "1px solid #EEE", display: "flex", zIndex: 20,
-    }}>
-      {items.map(it => (
-        <button key={it.id} onClick={() => setView(it.id)}
-          style={{
-            flex: 1, padding: "10px 0 12px", border: "none", background: "none",
-            display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
-            cursor: "pointer", color: view === it.id ? "#1B4B3A" : "#999",
-          }}>
+    <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff", borderTop: "1px solid #EEE", display: "flex", zIndex: 20 }}>
+      {[{ id: "home", icon: "🏠", label: "Home" }, { id: "search", icon: "🔍", label: "Search" }, { id: "profile", icon: "📊", label: "My Stats" }].map(it => (
+        <button key={it.id} onClick={() => setView(it.id)} style={{
+          flex: 1, padding: "10px 0 12px", border: "none", background: "none",
+          display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
+          cursor: "pointer", color: view === it.id ? "#1B4B3A" : "#999",
+        }}>
           <span style={{ fontSize: 20 }}>{it.icon}</span>
           <span style={{ fontSize: 10, fontFamily: "sans-serif" }}>{it.label}</span>
         </button>
@@ -1203,18 +1241,13 @@ function ConfettiOverlay({ show, onDone }) {
   if (!show) return null;
   return (
     <div onClick={onDone} style={{
-      position: "fixed", inset: 0, zIndex: 100,
-      background: "rgba(27,75,58,.92)", display: "flex", flexDirection: "column",
-      alignItems: "center", justifyContent: "center", color: "#fff", textAlign: "center",
-      padding: 32, cursor: "pointer",
+      position: "fixed", inset: 0, zIndex: 100, background: "rgba(27,75,58,.92)",
+      display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+      color: "#fff", textAlign: "center", padding: 32, cursor: "pointer",
     }}>
       <div style={{ fontSize: 72 }}>🎓</div>
-      <h2 style={{ fontFamily: "'Georgia', serif", fontSize: 28, margin: "16px 0 8px" }}>
-        You Did It!
-      </h2>
-      <p style={{ fontSize: 16, opacity: .85, maxWidth: 280, lineHeight: 1.5 }}>
-        All 1,000 experiences complete. Grant County is proud of you!
-      </p>
+      <h2 style={{ fontFamily: "'Georgia', serif", fontSize: 28, margin: "16px 0 8px" }}>You Did It!</h2>
+      <p style={{ fontSize: 16, opacity: .85, maxWidth: 280, lineHeight: 1.5 }}>All 1,000 experiences complete. Grant County is proud of you!</p>
       <div style={{ marginTop: 24, fontSize: 13, opacity: .6 }}>Tap anywhere to continue</div>
     </div>
   );
