@@ -72,7 +72,7 @@ This app is the digital version of the printed booklet distributed to students i
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR-USERNAME/grant-county-passport.git
+git clone https://github.com/ldtappan/grant-county-passport.git
 cd grant-county-passport
 
 # Install dependencies
@@ -99,7 +99,7 @@ npm run deploy
 ```
 
 The live app will be available at:
-`https://YOUR-USERNAME.github.io/grant-county-passport`
+`https://ldtappan.github.io/grant-county-passport`
 
 > Make sure your `package.json` includes the `homepage` field and `gh-pages` scripts. See the [publishing guide](#publishing-guide) below.
 
@@ -114,7 +114,7 @@ The live app will be available at:
 
 2. **Add to `package.json`:**
    ```json
-   "homepage": "https://YOUR-USERNAME.github.io/grant-county-passport",
+   "homepage": "https://ldtappan.github.io/grant-county-passport",
    "scripts": {
      "predeploy": "npm run build",
      "deploy": "gh-pages -d build"
@@ -170,7 +170,7 @@ This project belongs to the Grant County community. Contributions are welcome â€
 4. Push to your branch: `git push origin feature/my-improvement`
 5. Open a Pull Request
 
-For larger changes or ideas, open an [Issue](https://github.com/YOUR-USERNAME/grant-county-passport/issues) first so we can discuss it.
+For larger changes or ideas, open an [Issue](https://github.com/ldtappan/grant-county-passport/issues) first so we can discuss it.
 
 ---
 
