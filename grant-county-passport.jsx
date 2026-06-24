@@ -1,5 +1,18 @@
 import { useState, useEffect, useMemo } from "react";
 
+// ─── SCHOOLS ─────────────────────────────────────────────────────────────────
+const SCHOOLS = [
+  { id: "mhs",   name: "Marion High School",          short: "Marion HS" },
+  { id: "beech", name: "Mississinewa High School",    short: "Mississinewa" },
+  { id: "east",  name: "Eastern High School",         short: "Eastern" },
+  { id: "oak",   name: "Oak Hill High School",        short: "Oak Hill" },
+  { id: "river", name: "Riverview Middle School",     short: "Riverview MS" },
+  { id: "mms",   name: "Marion Middle School",        short: "Marion MS" },
+  { id: "north", name: "North Elementary",            short: "North Elem." },
+  { id: "south", name: "South Elementary",            short: "South Elem." },
+  { id: "other", name: "Other / Home School",         short: "Other" },
+];
+
 // ─── DATA ────────────────────────────────────────────────────────────────────
 const CATEGORIES = [
   {
@@ -638,16 +651,43 @@ const CATEGORIES = [
   },
 ];
 
+// ─── STORAGE ──────────────────────────────────────────────────────────────────
 const STORAGE_KEY = "grantco_passport_v2";
+const LEADERBOARD_KEY = "grantco_leaderboard_v1";
 
 function loadData() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : { checked: {}, signoffs: {}, name: "", school: "", started: "", dream: "" };
-  } catch { return { checked: {}, signoffs: {}, name: "", school: "", started: "", dream: "" }; }
+    return raw ? JSON.parse(raw) : { checked: {}, signoffs: {}, name: "", schoolId: "", started: "", dream: "", showOnBoard: true };
+  } catch { return { checked: {}, signoffs: {}, name: "", schoolId: "", started: "", dream: "", showOnBoard: true }; }
 }
 function saveData(d) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); } catch {}
+}
+
+// Leaderboard stored as: { [entryId]: { name, schoolId, count, pct, updatedAt, showOnBoard } }
+// entryId is a stable device ID stored alongside personal data
+function getDeviceId() {
+  let id = localStorage.getItem("grantco_device_id");
+  if (!id) { id = "dev_" + Math.random().toString(36).slice(2, 10); localStorage.setItem("grantco_device_id", id); }
+  return id;
+}
+function loadLeaderboard() {
+  try {
+    const raw = localStorage.getItem(LEADERBOARD_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch { return {}; }
+}
+function saveLeaderboard(board) {
+  try { localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(board)); } catch {}
+}
+
+// ─── MEDALS ───────────────────────────────────────────────────────────────────
+function medal(rank) {
+  if (rank === 1) return "🥇";
+  if (rank === 2) return "🥈";
+  if (rank === 3) return "🥉";
+  return `${rank}.`;
 }
 
 // ─── MAIN APP ─────────────────────────────────────────────────────────────────
@@ -657,8 +697,10 @@ export default function PassportApp() {
   const [activeCat, setActiveCat] = useState(null);
   const [search, setSearch] = useState("");
   const [confetti, setConfetti] = useState(false);
+  const [leaderboard, setLeaderboard] = useState(loadLeaderboard);
+
   // Sign-off modal state
-  const [signoffModal, setSignoffModal] = useState(null); // { catId }
+  const [signoffModal, setSignoffModal] = useState(null);
   const [signoffName, setSignoffName] = useState("");
   const [signoffRelation, setSignoffRelation] = useState("");
   const [signoffPin, setSignoffPin] = useState("");
@@ -668,65 +710,58 @@ export default function PassportApp() {
   const totalChecked = useMemo(() => Object.values(data.checked).filter(Boolean).length, [data.checked]);
   const pct = Math.round((totalChecked / 1000) * 100);
 
-  useEffect(() => { saveData(data); }, [data]);
+  // Sync this device's entry into the leaderboard whenever progress changes
+  useEffect(() => {
+    saveData(data);
+    const deviceId = getDeviceId();
+    const updated = {
+      ...leaderboard,
+      [deviceId]: {
+        name: data.name || "Anonymous",
+        schoolId: data.schoolId || "other",
+        count: totalChecked,
+        pct,
+        updatedAt: Date.now(),
+        showOnBoard: data.showOnBoard !== false,
+      }
+    };
+    setLeaderboard(updated);
+    saveLeaderboard(updated);
+  }, [data]);
 
   function toggle(n) {
     const next = { ...data, checked: { ...data.checked, [n]: !data.checked[n] } };
     setData(next);
     if (Object.values(next.checked).filter(Boolean).length === 1000) setConfetti(true);
   }
+  function updateProfile(field, val) { setData(d => ({ ...d, [field]: val })); }
 
-  function updateProfile(field, val) {
-    setData(d => ({ ...d, [field]: val }));
-  }
-
-  // ── Sign-off logic ──────────────────────────────────────────────────────────
-  // PIN is last 4 digits of adult's name length * experiences completed (simple, no server needed)
-  // We just require a name + relation + a 4-digit confirmation code they type themselves.
-  // The "PIN" is simply typed twice to confirm intent — this is a trust-based system, not cryptographic.
+  // ── Sign-off ────────────────────────────────────────────────────────────────
   function openSignoff(catId) {
-    setSignoffModal({ catId });
-    setSignoffName("");
-    setSignoffRelation("");
-    setSignoffPin("");
-    setSignoffError("");
-    setSignoffSuccess(false);
+    setSignoffModal({ catId }); setSignoffName(""); setSignoffRelation("");
+    setSignoffPin(""); setSignoffError(""); setSignoffSuccess(false);
   }
-
   function submitSignoff() {
     if (!signoffName.trim()) { setSignoffError("Please enter your name."); return; }
     if (!signoffRelation.trim()) { setSignoffError("Please enter your relationship to the student."); return; }
     if (signoffPin.length < 4) { setSignoffError("Please enter a 4-digit confirmation code."); return; }
-
     const cat = CATEGORIES.find(c => c.id === signoffModal.catId);
     const done = cat.items.filter(i => data.checked[i.n]).length;
     if (done < cat.items.length) {
-      setSignoffError(`All ${cat.items.length} experiences in this category must be checked off before signing.`);
-      return;
+      setSignoffError(`All ${cat.items.length} experiences must be checked before signing.`); return;
     }
-
-    const signoff = {
-      adultName: signoffName.trim(),
-      relation: signoffRelation.trim(),
-      date: new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
-      timestamp: Date.now(),
-    };
+    const signoff = { adultName: signoffName.trim(), relation: signoffRelation.trim(),
+      date: new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }), timestamp: Date.now() };
     setData(d => ({ ...d, signoffs: { ...d.signoffs, [signoffModal.catId]: signoff } }));
     setSignoffSuccess(true);
     setTimeout(() => { setSignoffModal(null); setSignoffSuccess(false); }, 2200);
   }
-
   function removeSignoff(catId) {
     if (!window.confirm("Remove this sign-off? The adult will need to sign again.")) return;
-    setData(d => {
-      const s = { ...d.signoffs };
-      delete s[catId];
-      return { ...d, signoffs: s };
-    });
+    setData(d => { const s = { ...d.signoffs }; delete s[catId]; return { ...d, signoffs: s }; });
   }
 
   const signedCount = Object.keys(data.signoffs).length;
-
   const searchResults = useMemo(() => {
     if (!search.trim()) return [];
     const q = search.toLowerCase();
@@ -736,59 +771,67 @@ export default function PassportApp() {
     );
   }, [search]);
 
+  // ── Leaderboard computed data ───────────────────────────────────────────────
+  const boardStats = useMemo(() => {
+    const entries = Object.values(leaderboard);
+    // Per-school aggregation
+    const bySchool = {};
+    SCHOOLS.forEach(s => { bySchool[s.id] = { schoolId: s.id, total: 0, students: 0, completions: 0 }; });
+    entries.forEach(e => {
+      const sid = e.schoolId || "other";
+      if (!bySchool[sid]) bySchool[sid] = { schoolId: sid, total: 0, students: 0, completions: 0 };
+      bySchool[sid].students += 1;
+      bySchool[sid].total += e.count;
+      if (e.count === 1000) bySchool[sid].completions += 1;
+    });
+    const schoolRanks = Object.values(bySchool)
+      .filter(s => s.students > 0)
+      .sort((a, b) => b.total - a.total);
+
+    // Top individual students (opt-in)
+    const topStudents = entries
+      .filter(e => e.showOnBoard && e.name && e.name !== "Anonymous")
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+
+    const communityTotal = entries.reduce((sum, e) => sum + e.count, 0);
+    const totalStudents = entries.length;
+    const completers = entries.filter(e => e.count === 1000).length;
+
+    return { schoolRanks, topStudents, communityTotal, totalStudents, completers };
+  }, [leaderboard]);
+
+  // ── VIEWS ───────────────────────────────────────────────────────────────────
+
   // ── Home ────────────────────────────────────────────────────────────────────
   if (view === "home") {
     return (
       <div style={{ minHeight: "100vh", background: "#F7F4EF", fontFamily: "'Georgia', serif", paddingBottom: 80 }}>
         <ConfettiOverlay show={confetti} onDone={() => setConfetti(false)} />
-        <SignoffModal
-          open={!!signoffModal}
-          catId={signoffModal?.catId}
-          name={signoffName} setName={setSignoffName}
-          relation={signoffRelation} setRelation={setSignoffRelation}
-          pin={signoffPin} setPin={setSignoffPin}
-          error={signoffError} success={signoffSuccess}
-          onSubmit={submitSignoff}
-          onClose={() => setSignoffModal(null)}
-          data={data}
-        />
+        <SignoffModal open={!!signoffModal} catId={signoffModal?.catId}
+          name={signoffName} setName={setSignoffName} relation={signoffRelation} setRelation={setSignoffRelation}
+          pin={signoffPin} setPin={setSignoffPin} error={signoffError} success={signoffSuccess}
+          onSubmit={submitSignoff} onClose={() => setSignoffModal(null)} data={data} />
 
-        {/* Header */}
-        <div style={{
-          background: "linear-gradient(135deg, #1B4B3A 0%, #2D7A56 60%, #4A9B6F 100%)",
-          padding: "32px 20px 28px", textAlign: "center", color: "#fff",
-        }}>
-          <div style={{ fontSize: 11, letterSpacing: 4, textTransform: "uppercase", opacity: 0.7, marginBottom: 6 }}>
-            Grant County, Indiana
-          </div>
-          <h1 style={{ margin: 0, fontSize: "clamp(22px, 5vw, 36px)", fontWeight: 700, lineHeight: 1.1 }}>
-            1,000 Things to Do
-          </h1>
+        <div style={{ background: "linear-gradient(135deg, #1B4B3A 0%, #2D7A56 60%, #4A9B6F 100%)", padding: "32px 20px 28px", textAlign: "center", color: "#fff" }}>
+          <div style={{ fontSize: 11, letterSpacing: 4, textTransform: "uppercase", opacity: 0.7, marginBottom: 6 }}>Grant County, Indiana</div>
+          <h1 style={{ margin: 0, fontSize: "clamp(22px, 5vw, 36px)", fontWeight: 700, lineHeight: 1.1 }}>1,000 Things to Do</h1>
           <div style={{ fontSize: 14, opacity: 0.8, marginTop: 4 }}>Before You Graduate</div>
           {data.name && <div style={{ marginTop: 14, fontSize: 15, opacity: 0.9 }}>Welcome back, <strong>{data.name}</strong> ✦</div>}
           <div style={{ margin: "20px auto 0", display: "flex", justifyContent: "center" }}>
             <ProgressRing pct={pct} count={totalChecked} />
           </div>
-          {/* Sign-off summary pill */}
           <div style={{ marginTop: 14, display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,.15)", borderRadius: 20, padding: "5px 14px", fontSize: 13 }}>
-            <span>✍️</span>
-            <span>{signedCount} of {CATEGORIES.length} categories signed off</span>
+            <span>✍️</span><span>{signedCount} of {CATEGORIES.length} categories signed off</span>
           </div>
         </div>
 
-        {/* Nav pills */}
         <div style={{ display: "flex", gap: 8, padding: "16px 16px 0", overflowX: "auto" }}>
-          {[{ label: "🏠 Home", id: "home" }, { label: "🔍 Search", id: "search" }, { label: "👤 Profile", id: "profile" }].map(n => (
-            <button key={n.id} onClick={() => setView(n.id)} style={{
-              flex: "none", padding: "7px 16px", borderRadius: 20, border: "none",
-              background: view === n.id ? "#1B4B3A" : "#E8E4DC",
-              color: view === n.id ? "#fff" : "#333",
-              fontFamily: "inherit", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap",
-            }}>{n.label}</button>
+          {[{ label: "🏠 Home", id: "home" }, { label: "🔍 Search", id: "search" }, { label: "🏆 Board", id: "leaderboard" }, { label: "👤 Profile", id: "profile" }].map(n => (
+            <button key={n.id} onClick={() => setView(n.id)} style={{ flex: "none", padding: "7px 16px", borderRadius: 20, border: "none", background: view === n.id ? "#1B4B3A" : "#E8E4DC", color: view === n.id ? "#fff" : "#333", fontFamily: "inherit", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap" }}>{n.label}</button>
           ))}
         </div>
 
-        {/* Category grid */}
         <div style={{ padding: "16px" }}>
           <div style={{ fontSize: 12, letterSpacing: 2, textTransform: "uppercase", color: "#888", marginBottom: 12 }}>Categories</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(155px, 1fr))", gap: 10 }}>
@@ -799,37 +842,163 @@ export default function PassportApp() {
               const signed = !!data.signoffs[cat.id];
               return (
                 <button key={cat.id} onClick={() => { setActiveCat(cat.id); setView("category"); }}
-                  style={{
-                    background: "#fff", border: `2px solid ${signed ? cat.color + "80" : cat.color + "20"}`,
-                    borderRadius: 12, padding: "14px 12px", cursor: "pointer",
-                    textAlign: "left", transition: "box-shadow .15s",
-                    boxShadow: signed ? `0 2px 10px ${cat.color}25` : "0 1px 4px rgba(0,0,0,.06)",
-                    position: "relative",
-                  }}
+                  style={{ background: "#fff", border: `2px solid ${signed ? cat.color + "80" : cat.color + "20"}`, borderRadius: 12, padding: "14px 12px", cursor: "pointer", textAlign: "left", transition: "box-shadow .15s", boxShadow: signed ? `0 2px 10px ${cat.color}25` : "0 1px 4px rgba(0,0,0,.06)", position: "relative" }}
                   onMouseEnter={e => e.currentTarget.style.boxShadow = `0 4px 16px ${cat.color}30`}
-                  onMouseLeave={e => e.currentTarget.style.boxShadow = signed ? `0 2px 10px ${cat.color}25` : "0 1px 4px rgba(0,0,0,.06)"}
-                >
-                  {signed && (
-                    <div style={{ position: "absolute", top: 8, right: 8, fontSize: 14 }} title="Signed off by adult">✅</div>
-                  )}
+                  onMouseLeave={e => e.currentTarget.style.boxShadow = signed ? `0 2px 10px ${cat.color}25` : "0 1px 4px rgba(0,0,0,.06)"}>
+                  {signed && <div style={{ position: "absolute", top: 8, right: 8, fontSize: 14 }}>✅</div>}
                   <div style={{ fontSize: 22, marginBottom: 6 }}>{cat.emoji}</div>
                   <div style={{ fontSize: 12, fontWeight: 700, color: "#222", lineHeight: 1.3, marginBottom: 8 }}>{cat.label}</div>
                   <div style={{ background: "#F0EDE8", borderRadius: 4, height: 5, overflow: "hidden" }}>
                     <div style={{ width: `${catPct}%`, height: "100%", background: cat.color, borderRadius: 4, transition: "width .4s" }} />
                   </div>
                   <div style={{ fontSize: 11, color: "#888", marginTop: 4 }}>{done}/{total}</div>
-                  {signed && (
-                    <div style={{ fontSize: 10, color: cat.color, marginTop: 3, fontWeight: 600 }}>
-                      Signed by {data.signoffs[cat.id].adultName}
-                    </div>
-                  )}
+                  {signed && <div style={{ fontSize: 10, color: cat.color, marginTop: 3, fontWeight: 600 }}>Signed by {data.signoffs[cat.id].adultName}</div>}
                 </button>
               );
             })}
           </div>
         </div>
-        <div style={{ textAlign: "center", padding: "24px 16px", color: "#aaa", fontSize: 11 }}>
-          Project Leadership · Grant County, Indiana · Copyright © 2021
+        <div style={{ textAlign: "center", padding: "24px 16px", color: "#aaa", fontSize: 11 }}>Project Leadership · Grant County, Indiana · Copyright © 2021</div>
+        <BottomNav view={view} setView={setView} />
+      </div>
+    );
+  }
+
+  // ── Leaderboard ─────────────────────────────────────────────────────────────
+  if (view === "leaderboard") {
+    const { schoolRanks, topStudents, communityTotal, totalStudents, completers } = boardStats;
+    const mySchool = SCHOOLS.find(s => s.id === data.schoolId);
+    const mySchoolRank = schoolRanks.findIndex(s => s.schoolId === data.schoolId) + 1;
+
+    return (
+      <div style={{ minHeight: "100vh", background: "#F7F4EF", fontFamily: "'Georgia', serif", paddingBottom: 80 }}>
+        {/* Header */}
+        <div style={{ background: "linear-gradient(135deg, #1B3A6B 0%, #2C5AA0 60%, #4A78C9 100%)", padding: "28px 20px 24px", color: "#fff", textAlign: "center" }}>
+          <div style={{ fontSize: 11, letterSpacing: 4, textTransform: "uppercase", opacity: 0.7, marginBottom: 6 }}>Grant County Community</div>
+          <h2 style={{ margin: 0, fontSize: 26, fontWeight: 700 }}>🏆 Leaderboard</h2>
+          <div style={{ fontSize: 13, opacity: 0.8, marginTop: 4 }}>Collective progress across all schools</div>
+
+          {/* Community stats row */}
+          <div style={{ display: "flex", justifyContent: "center", gap: 12, marginTop: 20, flexWrap: "wrap" }}>
+            {[
+              { label: "Experiences\nCompleted", value: communityTotal.toLocaleString() },
+              { label: "Students\nParticipating", value: totalStudents },
+              { label: "Full\nCompleters", value: completers },
+            ].map(stat => (
+              <div key={stat.label} style={{ background: "rgba(255,255,255,.15)", borderRadius: 12, padding: "12px 18px", minWidth: 90, textAlign: "center" }}>
+                <div style={{ fontSize: 22, fontWeight: 700 }}>{stat.value}</div>
+                <div style={{ fontSize: 10, opacity: 0.8, marginTop: 3, lineHeight: 1.3, whiteSpace: "pre-line" }}>{stat.label}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Community progress bar */}
+          <div style={{ marginTop: 16, maxWidth: 400, margin: "16px auto 0" }}>
+            <div style={{ fontSize: 11, opacity: 0.7, marginBottom: 5 }}>
+              Community goal: {(totalStudents * 1000).toLocaleString()} total experiences
+            </div>
+            <div style={{ background: "rgba(255,255,255,.2)", borderRadius: 6, height: 10 }}>
+              <div style={{ width: `${Math.min(100, (communityTotal / Math.max(1, totalStudents * 1000)) * 100)}%`, height: "100%", background: "#fff", borderRadius: 6, transition: "width .6s" }} />
+            </div>
+            <div style={{ fontSize: 11, opacity: 0.75, marginTop: 4 }}>
+              {Math.round((communityTotal / Math.max(1, totalStudents * 1000)) * 100)}% of the way there
+            </div>
+          </div>
+        </div>
+
+        <div style={{ padding: 16 }}>
+
+          {/* My school callout */}
+          {mySchool && mySchoolRank > 0 && (
+            <div style={{ background: "#fff", borderRadius: 14, padding: "14px 16px", marginBottom: 16, border: "2px solid #2C5AA030", boxShadow: "0 2px 10px rgba(44,90,160,.1)" }}>
+              <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 2, color: "#2C5AA0", marginBottom: 6 }}>Your School</div>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div>
+                  <div style={{ fontSize: 16, fontWeight: 700 }}>{medal(mySchoolRank)} {mySchool.name}</div>
+                  <div style={{ fontSize: 12, color: "#666", marginTop: 2 }}>
+                    {schoolRanks.find(s => s.schoolId === data.schoolId)?.total.toLocaleString() || 0} experiences · {schoolRanks.find(s => s.schoolId === data.schoolId)?.students || 0} students
+                  </div>
+                </div>
+                <div style={{ fontSize: 28 }}>🏫</div>
+              </div>
+            </div>
+          )}
+
+          {/* School Rankings */}
+          <div style={{ background: "#fff", borderRadius: 14, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,.06)", marginBottom: 16 }}>
+            <div style={{ padding: "16px 16px 12px", borderBottom: "1px solid #F0EDE8" }}>
+              <div style={{ fontSize: 14, fontWeight: 700 }}>🏫 School Rankings</div>
+              <div style={{ fontSize: 11, color: "#888", marginTop: 2 }}>Ranked by total experiences completed</div>
+            </div>
+            {schoolRanks.length === 0 ? (
+              <div style={{ padding: "24px 16px", textAlign: "center", color: "#aaa", fontSize: 13 }}>
+                No school data yet. Set your school in your Profile to appear here!
+              </div>
+            ) : (
+              schoolRanks.map((s, i) => {
+                const school = SCHOOLS.find(sc => sc.id === s.schoolId);
+                const isMe = s.schoolId === data.schoolId;
+                const avgPct = s.students > 0 ? Math.round((s.total / (s.students * 1000)) * 100) : 0;
+                return (
+                  <div key={s.schoolId} style={{ padding: "14px 16px", borderBottom: "1px solid #F7F4EF", background: isMe ? "#EAF4FF" : "#fff", display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ fontSize: i < 3 ? 22 : 15, minWidth: 32, textAlign: "center", fontWeight: 700, color: "#555" }}>{medal(i + 1)}</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 14, fontWeight: isMe ? 700 : 500, color: isMe ? "#1B3A6B" : "#222" }}>
+                        {school ? school.name : s.schoolId} {isMe ? "⬅ you" : ""}
+                      </div>
+                      <div style={{ fontSize: 11, color: "#888", marginTop: 2 }}>{s.students} student{s.students !== 1 ? "s" : ""} · avg {avgPct}% complete</div>
+                      <div style={{ background: "#F0EDE8", borderRadius: 3, height: 5, marginTop: 5 }}>
+                        <div style={{ width: `${avgPct}%`, height: "100%", background: i === 0 ? "#F1C40F" : i === 1 ? "#BDC3C7" : i === 2 ? "#D35400" : "#2C5AA0", borderRadius: 3, transition: "width .4s" }} />
+                      </div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: "#1B3A6B" }}>{s.total.toLocaleString()}</div>
+                      <div style={{ fontSize: 10, color: "#aaa" }}>total</div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Top Students */}
+          <div style={{ background: "#fff", borderRadius: 14, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,.06)", marginBottom: 16 }}>
+            <div style={{ padding: "16px 16px 12px", borderBottom: "1px solid #F0EDE8" }}>
+              <div style={{ fontSize: 14, fontWeight: 700 }}>⭐ Top Students</div>
+              <div style={{ fontSize: 11, color: "#888", marginTop: 2 }}>Students who opted in to appear on the board</div>
+            </div>
+            {topStudents.length === 0 ? (
+              <div style={{ padding: "24px 16px", textAlign: "center", color: "#aaa", fontSize: 13 }}>
+                No students on the board yet. Add your name in Profile and enable "Show on Leaderboard"!
+              </div>
+            ) : (
+              topStudents.map((s, i) => {
+                const school = SCHOOLS.find(sc => sc.id === s.schoolId);
+                const deviceId = getDeviceId();
+                const isMe = Object.entries(leaderboard).find(([k, v]) => v === s)?.[0] === deviceId;
+                return (
+                  <div key={i} style={{ padding: "13px 16px", borderBottom: "1px solid #F7F4EF", background: isMe ? "#EAF4FF" : "#fff", display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ fontSize: i < 3 ? 22 : 15, minWidth: 32, textAlign: "center", fontWeight: 700, color: "#555" }}>{medal(i + 1)}</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 14, fontWeight: isMe ? 700 : 500, color: isMe ? "#1B3A6B" : "#222" }}>
+                        {s.name} {isMe ? "⬅ you" : ""}
+                      </div>
+                      <div style={{ fontSize: 11, color: "#888", marginTop: 1 }}>{school ? school.short : "—"}</div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: "#1B3A6B" }}>{s.count}</div>
+                      <div style={{ fontSize: 10, color: "#aaa" }}>{s.pct}%</div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Privacy note */}
+          <div style={{ background: "#F0F7F4", borderRadius: 12, padding: "12px 14px", fontSize: 12, color: "#2D5A47", lineHeight: 1.5 }}>
+            <strong>📍 Note:</strong> This leaderboard is stored on your device only and reflects everyone who has used this app on this device or browser. For a real community-wide leaderboard across all students and schools, a cloud database would be needed — this is a great next step for the full launch!
+          </div>
         </div>
         <BottomNav view={view} setView={setView} />
       </div>
@@ -842,18 +1011,14 @@ export default function PassportApp() {
       <div style={{ minHeight: "100vh", background: "#F7F4EF", fontFamily: "'Georgia', serif", paddingBottom: 80 }}>
         <TopBar onBack={() => setView("home")} title="Search Experiences" />
         <div style={{ padding: 16 }}>
-          <input autoFocus value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Search 1,000 experiences…"
+          <input autoFocus value={search} onChange={e => setSearch(e.target.value)} placeholder="Search 1,000 experiences…"
             style={{ width: "100%", boxSizing: "border-box", padding: "12px 16px", borderRadius: 10, border: "2px solid #DDD", fontSize: 15, fontFamily: "inherit", outline: "none" }} />
           {search && <div style={{ marginTop: 12, color: "#888", fontSize: 12 }}>{searchResults.length} result{searchResults.length !== 1 ? "s" : ""}</div>}
           <div style={{ marginTop: 8 }}>
             {searchResults.map(it => (
-              <ExperienceRow key={it.n} item={it} checked={!!data.checked[it.n]} onToggle={() => toggle(it.n)}
-                accent={it.cat.color} sub={`#${it.n} · ${it.cat.label}`} />
+              <ExperienceRow key={it.n} item={it} checked={!!data.checked[it.n]} onToggle={() => toggle(it.n)} accent={it.cat.color} sub={`#${it.n} · ${it.cat.label}`} />
             ))}
-            {search && searchResults.length === 0 && (
-              <div style={{ textAlign: "center", padding: 40, color: "#aaa" }}>No experiences found for "{search}"</div>
-            )}
+            {search && searchResults.length === 0 && <div style={{ textAlign: "center", padding: 40, color: "#aaa" }}>No experiences found for "{search}"</div>}
           </div>
         </div>
         <BottomNav view={view} setView={setView} />
@@ -871,45 +1036,54 @@ export default function PassportApp() {
             <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 2, color: "#888", marginBottom: 16 }}>About Me</div>
             {[
               { key: "name", label: "Your Name", placeholder: "Enter your name" },
-              { key: "school", label: "School", placeholder: "Your school name" },
               { key: "started", label: "Started On", placeholder: "e.g. September 5, 2024", type: "date" },
               { key: "dream", label: "Dream for the Future", placeholder: "What do you want to be?" },
             ].map(f => (
               <div key={f.key} style={{ marginBottom: 14 }}>
                 <label style={{ display: "block", fontSize: 12, color: "#555", marginBottom: 4 }}>{f.label}</label>
-                <input type={f.type || "text"} value={data[f.key] || ""} onChange={e => updateProfile(f.key, e.target.value)}
-                  placeholder={f.placeholder}
+                <input type={f.type || "text"} value={data[f.key] || ""} onChange={e => updateProfile(f.key, e.target.value)} placeholder={f.placeholder}
                   style={{ width: "100%", boxSizing: "border-box", padding: "10px 12px", borderRadius: 8, border: "1.5px solid #E0DDD8", fontSize: 14, fontFamily: "inherit" }} />
               </div>
             ))}
+
+            {/* School picker */}
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ display: "block", fontSize: 12, color: "#555", marginBottom: 4 }}>Your School</label>
+              <select value={data.schoolId || ""} onChange={e => updateProfile("schoolId", e.target.value)}
+                style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "1.5px solid #E0DDD8", fontSize: 14, fontFamily: "inherit", background: "#fff", color: data.schoolId ? "#222" : "#aaa" }}>
+                <option value="">— Select your school —</option>
+                {SCHOOLS.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+              </select>
+            </div>
+
+            {/* Leaderboard opt-in toggle */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderTop: "1px solid #F0EDE8" }}>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600 }}>Show me on the Leaderboard</div>
+                <div style={{ fontSize: 11, color: "#888", marginTop: 2 }}>Your name and progress appear on the Top Students list</div>
+              </div>
+              <button onClick={() => updateProfile("showOnBoard", !(data.showOnBoard !== false))}
+                style={{ width: 46, height: 26, borderRadius: 13, border: "none", cursor: "pointer", background: data.showOnBoard !== false ? "#2D7A56" : "#CCC", transition: "background .2s", position: "relative", flexShrink: 0 }}>
+                <div style={{ position: "absolute", top: 3, left: data.showOnBoard !== false ? 23 : 3, width: 20, height: 20, borderRadius: "50%", background: "#fff", transition: "left .2s", boxShadow: "0 1px 3px rgba(0,0,0,.2)" }} />
+              </button>
+            </div>
           </div>
 
-          {/* Sign-off summary card */}
+          {/* Sign-off summary */}
           <div style={{ marginTop: 16, background: "#fff", borderRadius: 14, padding: 20, boxShadow: "0 1px 6px rgba(0,0,0,.06)" }}>
-            <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 2, color: "#888", marginBottom: 14 }}>
-              Adult Sign-Offs
-            </div>
+            <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 2, color: "#888", marginBottom: 14 }}>Adult Sign-Offs</div>
             <div style={{ fontSize: 13, color: "#555", marginBottom: 14, lineHeight: 1.5 }}>
-              {signedCount === 0
-                ? "No categories have been signed off yet. Complete all experiences in a category, then ask a trusted adult to sign."
-                : `${signedCount} of ${CATEGORIES.length} categories have been approved by a trusted adult.`}
+              {signedCount === 0 ? "No categories have been signed off yet. Complete all experiences in a category, then ask a trusted adult to sign." : `${signedCount} of ${CATEGORIES.length} categories have been approved.`}
             </div>
             {CATEGORIES.filter(c => data.signoffs[c.id]).map(cat => {
               const s = data.signoffs[cat.id];
               return (
-                <div key={cat.id} style={{
-                  display: "flex", alignItems: "center", justifyContent: "space-between",
-                  padding: "10px 12px", background: `${cat.color}10`, borderRadius: 10,
-                  border: `1.5px solid ${cat.color}30`, marginBottom: 8,
-                }}>
+                <div key={cat.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", background: `${cat.color}10`, borderRadius: 10, border: `1.5px solid ${cat.color}30`, marginBottom: 8 }}>
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 700, color: "#222" }}>{cat.emoji} {cat.label}</div>
-                    <div style={{ fontSize: 11, color: "#666", marginTop: 2 }}>
-                      Signed by <strong>{s.adultName}</strong> ({s.relation}) · {s.date}
-                    </div>
+                    <div style={{ fontSize: 11, color: "#666", marginTop: 2 }}>Signed by <strong>{s.adultName}</strong> ({s.relation}) · {s.date}</div>
                   </div>
-                  <button onClick={() => removeSignoff(cat.id)} title="Remove sign-off"
-                    style={{ background: "none", border: "none", color: "#C0392B", fontSize: 16, cursor: "pointer", padding: 4 }}>✕</button>
+                  <button onClick={() => removeSignoff(cat.id)} style={{ background: "none", border: "none", color: "#C0392B", fontSize: 16, cursor: "pointer", padding: 4 }}>✕</button>
                 </div>
               );
             })}
@@ -947,11 +1121,8 @@ export default function PassportApp() {
             })}
           </div>
 
-          <button onClick={() => {
-            if (window.confirm("Reset all your progress and sign-offs? This cannot be undone.")) {
-              setData({ checked: {}, signoffs: {}, name: data.name, school: data.school, started: data.started, dream: data.dream });
-            }
-          }} style={{ marginTop: 16, width: "100%", padding: "12px", background: "transparent", border: "1.5px solid #E0DDD8", borderRadius: 10, color: "#C0392B", fontFamily: "inherit", fontSize: 14, cursor: "pointer" }}>
+          <button onClick={() => { if (window.confirm("Reset all progress and sign-offs? This cannot be undone.")) setData({ checked: {}, signoffs: {}, name: data.name, schoolId: data.schoolId, started: data.started, dream: data.dream, showOnBoard: data.showOnBoard }); }}
+            style={{ marginTop: 16, width: "100%", padding: "12px", background: "transparent", border: "1.5px solid #E0DDD8", borderRadius: 10, color: "#C0392B", fontFamily: "inherit", fontSize: 14, cursor: "pointer" }}>
             Reset All Progress
           </button>
         </div>
@@ -969,22 +1140,12 @@ export default function PassportApp() {
     const catPct = Math.round((done / total) * 100);
     const allDone = done === total;
     const signed = data.signoffs[cat.id];
-
     return (
       <div style={{ minHeight: "100vh", background: "#F7F4EF", fontFamily: "'Georgia', serif", paddingBottom: 80 }}>
-        <SignoffModal
-          open={!!signoffModal}
-          catId={signoffModal?.catId}
-          name={signoffName} setName={setSignoffName}
-          relation={signoffRelation} setRelation={setSignoffRelation}
-          pin={signoffPin} setPin={setSignoffPin}
-          error={signoffError} success={signoffSuccess}
-          onSubmit={submitSignoff}
-          onClose={() => setSignoffModal(null)}
-          data={data}
-        />
-
-        {/* Category header */}
+        <SignoffModal open={!!signoffModal} catId={signoffModal?.catId}
+          name={signoffName} setName={setSignoffName} relation={signoffRelation} setRelation={setSignoffRelation}
+          pin={signoffPin} setPin={setSignoffPin} error={signoffError} success={signoffSuccess}
+          onSubmit={submitSignoff} onClose={() => setSignoffModal(null)} data={data} />
         <div style={{ background: cat.color, padding: "24px 16px 20px", color: "#fff" }}>
           <button onClick={() => setView("home")} style={{ background: "none", border: "none", color: "#fff", fontSize: 22, cursor: "pointer", padding: 0, marginBottom: 8 }}>←</button>
           <div style={{ fontSize: 30, marginBottom: 4 }}>{cat.emoji}</div>
@@ -995,65 +1156,36 @@ export default function PassportApp() {
           </div>
           <div style={{ fontSize: 12, marginTop: 5, opacity: 0.9 }}>{done} of {total} completed</div>
         </div>
-
-        {/* Sign-off banner — shown when all done */}
         {allDone && !signed && (
-          <div style={{
-            margin: "14px 16px 0",
-            background: "linear-gradient(135deg, #1B4B3A, #2D7A56)",
-            borderRadius: 12, padding: "16px", color: "#fff",
-            display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
-          }}>
+          <div style={{ margin: "14px 16px 0", background: "linear-gradient(135deg, #1B4B3A, #2D7A56)", borderRadius: 12, padding: "16px", color: "#fff", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
             <div>
               <div style={{ fontWeight: 700, fontSize: 14 }}>🎉 All done! Ready for sign-off.</div>
               <div style={{ fontSize: 12, opacity: 0.85, marginTop: 3 }}>Hand the phone to a trusted adult to approve this category.</div>
             </div>
-            <button onClick={() => openSignoff(cat.id)}
-              style={{ background: "#fff", color: "#1B4B3A", border: "none", borderRadius: 8, padding: "8px 14px", fontFamily: "inherit", fontSize: 13, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>
-              Sign Off
-            </button>
+            <button onClick={() => openSignoff(cat.id)} style={{ background: "#fff", color: "#1B4B3A", border: "none", borderRadius: 8, padding: "8px 14px", fontFamily: "inherit", fontSize: 13, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>Sign Off</button>
           </div>
         )}
-
-        {/* Signed banner */}
         {signed && (
-          <div style={{
-            margin: "14px 16px 0", background: "#fff", borderRadius: 12, padding: "14px 16px",
-            border: `2px solid ${cat.color}50`, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10,
-          }}>
+          <div style={{ margin: "14px 16px 0", background: "#fff", borderRadius: 12, padding: "14px 16px", border: `2px solid ${cat.color}50`, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
             <div>
               <div style={{ fontWeight: 700, fontSize: 14, color: "#1B4B3A" }}>✅ Approved by {signed.adultName}</div>
               <div style={{ fontSize: 11, color: "#666", marginTop: 2 }}>{signed.relation} · {signed.date}</div>
             </div>
-            <button onClick={() => removeSignoff(cat.id)}
-              style={{ background: "none", border: "1px solid #DDD", borderRadius: 6, padding: "5px 10px", color: "#888", fontFamily: "inherit", fontSize: 11, cursor: "pointer" }}>
-              Remove
-            </button>
+            <button onClick={() => removeSignoff(cat.id)} style={{ background: "none", border: "1px solid #DDD", borderRadius: 6, padding: "5px 10px", color: "#888", fontFamily: "inherit", fontSize: 11, cursor: "pointer" }}>Remove</button>
           </div>
         )}
-
-        {/* Check all / uncheck all */}
         <div style={{ padding: "12px 16px 0", display: "flex", gap: 8 }}>
-          <button onClick={() => {
-            const allChecked = cat.items.every(i => data.checked[i.n]);
-            const updates = {};
-            cat.items.forEach(i => { updates[i.n] = !allChecked; });
-            setData(d => ({ ...d, checked: { ...d.checked, ...updates } }));
-          }} style={{ flex: 1, padding: "8px", borderRadius: 8, border: `1.5px solid ${cat.color}`, background: "transparent", color: cat.color, fontFamily: "inherit", fontSize: 13, cursor: "pointer" }}>
+          <button onClick={() => { const allChecked = cat.items.every(i => data.checked[i.n]); const updates = {}; cat.items.forEach(i => { updates[i.n] = !allChecked; }); setData(d => ({ ...d, checked: { ...d.checked, ...updates } })); }}
+            style={{ flex: 1, padding: "8px", borderRadius: 8, border: `1.5px solid ${cat.color}`, background: "transparent", color: cat.color, fontFamily: "inherit", fontSize: 13, cursor: "pointer" }}>
             {cat.items.every(i => data.checked[i.n]) ? "Uncheck All" : "Check All"}
           </button>
           {allDone && !signed && (
-            <button onClick={() => openSignoff(cat.id)}
-              style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: cat.color, color: "#fff", fontFamily: "inherit", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
-              ✍️ Get Sign-Off
-            </button>
+            <button onClick={() => openSignoff(cat.id)} style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: cat.color, color: "#fff", fontFamily: "inherit", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>✍️ Get Sign-Off</button>
           )}
         </div>
-
         <div style={{ padding: "12px 16px" }}>
           {cat.items.sort((a, b) => a.n - b.n).map(item => (
-            <ExperienceRow key={item.n} item={item} checked={!!data.checked[item.n]}
-              onToggle={() => toggle(item.n)} accent={cat.color} />
+            <ExperienceRow key={item.n} item={item} checked={!!data.checked[item.n]} onToggle={() => toggle(item.n)} accent={cat.color} />
           ))}
         </div>
         <BottomNav view={view} setView={setView} />
@@ -1070,19 +1202,9 @@ function SignoffModal({ open, catId, name, setName, relation, setRelation, pin, 
   const cat = CATEGORIES.find(c => c.id === catId);
   const done = cat ? cat.items.filter(i => data.checked[i.n]).length : 0;
   const total = cat ? cat.items.length : 0;
-
   return (
-    <div style={{
-      position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,.55)",
-      display: "flex", alignItems: "flex-end", justifyContent: "center",
-    }} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
-      <div style={{
-        background: "#fff", borderRadius: "20px 20px 0 0", padding: "24px 20px 36px",
-        width: "100%", maxWidth: 500, boxSizing: "border-box",
-        animation: "slideUp .25s ease",
-      }}>
-        <style>{`@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }`}</style>
-
+    <div style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,.55)", display: "flex", alignItems: "flex-end", justifyContent: "center" }} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+      <div style={{ background: "#fff", borderRadius: "20px 20px 0 0", padding: "24px 20px 36px", width: "100%", maxWidth: 500, boxSizing: "border-box", animation: "slideUp .25s ease" }}>
         {success ? (
           <div style={{ textAlign: "center", padding: "24px 0" }}>
             <div style={{ fontSize: 52 }}>✅</div>
@@ -1091,7 +1213,6 @@ function SignoffModal({ open, catId, name, setName, relation, setRelation, pin, 
           </div>
         ) : (
           <>
-            {/* Header */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 18 }}>
               <div>
                 <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 2, color: "#888" }}>Adult Sign-Off</div>
@@ -1100,54 +1221,24 @@ function SignoffModal({ open, catId, name, setName, relation, setRelation, pin, 
               </div>
               <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "#aaa", padding: 0 }}>✕</button>
             </div>
-
-            {/* Instruction */}
             <div style={{ background: "#F0F7F4", borderRadius: 10, padding: "12px 14px", marginBottom: 16, fontSize: 13, color: "#2D5A47", lineHeight: 1.5 }}>
               <strong>For the trusted adult:</strong> Please review this student's completed experiences and sign below to confirm you witnessed or are aware of their participation.
             </div>
-
-            {/* Fields */}
-            {[
-              { label: "Your full name", value: name, set: setName, placeholder: "e.g. Maria Johnson" },
-              { label: "Your relationship to the student", value: relation, set: setRelation, placeholder: "e.g. Parent, Teacher, Mentor" },
-            ].map(f => (
+            {[{ label: "Your full name", value: name, set: setName, placeholder: "e.g. Maria Johnson" }, { label: "Your relationship to the student", value: relation, set: setRelation, placeholder: "e.g. Parent, Teacher, Mentor" }].map(f => (
               <div key={f.label} style={{ marginBottom: 14 }}>
                 <label style={{ display: "block", fontSize: 12, color: "#555", marginBottom: 4 }}>{f.label}</label>
                 <input value={f.value} onChange={e => f.set(e.target.value)} placeholder={f.placeholder}
                   style={{ width: "100%", boxSizing: "border-box", padding: "10px 12px", borderRadius: 8, border: "1.5px solid #E0DDD8", fontSize: 14, fontFamily: "inherit" }} />
               </div>
             ))}
-
-            {/* Confirmation code */}
             <div style={{ marginBottom: 14 }}>
-              <label style={{ display: "block", fontSize: 12, color: "#555", marginBottom: 4 }}>
-                Create a 4-digit confirmation code
-                <span style={{ color: "#999", fontWeight: 400 }}> (you'll need this if changes are ever disputed)</span>
-              </label>
-              <input
-                value={pin} onChange={e => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                placeholder="e.g. 4729" inputMode="numeric" maxLength={4}
-                style={{ width: "100%", boxSizing: "border-box", padding: "10px 12px", borderRadius: 8, border: "1.5px solid #E0DDD8", fontSize: 18, letterSpacing: 8, fontFamily: "inherit", textAlign: "center" }}
-              />
+              <label style={{ display: "block", fontSize: 12, color: "#555", marginBottom: 4 }}>Create a 4-digit confirmation code <span style={{ color: "#999", fontWeight: 400 }}>(for your records)</span></label>
+              <input value={pin} onChange={e => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))} placeholder="e.g. 4729" inputMode="numeric" maxLength={4}
+                style={{ width: "100%", boxSizing: "border-box", padding: "10px 12px", borderRadius: 8, border: "1.5px solid #E0DDD8", fontSize: 18, letterSpacing: 8, fontFamily: "inherit", textAlign: "center" }} />
             </div>
-
-            {error && (
-              <div style={{ background: "#FEF0F0", border: "1px solid #FACACA", borderRadius: 8, padding: "10px 12px", fontSize: 13, color: "#C0392B", marginBottom: 14 }}>
-                {error}
-              </div>
-            )}
-
-            <button onClick={onSubmit} style={{
-              width: "100%", padding: "14px", borderRadius: 10, border: "none",
-              background: "linear-gradient(135deg, #1B4B3A, #2D7A56)",
-              color: "#fff", fontFamily: "inherit", fontSize: 16, fontWeight: 700, cursor: "pointer",
-            }}>
-              ✍️ Approve & Sign
-            </button>
-
-            <div style={{ fontSize: 11, color: "#aaa", textAlign: "center", marginTop: 10, lineHeight: 1.4 }}>
-              By signing, you confirm you are a trusted adult and that this student has completed the experiences in this category to the best of your knowledge.
-            </div>
+            {error && <div style={{ background: "#FEF0F0", border: "1px solid #FACACA", borderRadius: 8, padding: "10px 12px", fontSize: 13, color: "#C0392B", marginBottom: 14 }}>{error}</div>}
+            <button onClick={onSubmit} style={{ width: "100%", padding: "14px", borderRadius: 10, border: "none", background: "linear-gradient(135deg, #1B4B3A, #2D7A56)", color: "#fff", fontFamily: "inherit", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>✍️ Approve & Sign</button>
+            <div style={{ fontSize: 11, color: "#aaa", textAlign: "center", marginTop: 10, lineHeight: 1.4 }}>By signing, you confirm you are a trusted adult and that this student has completed the experiences in this category to the best of your knowledge.</div>
           </>
         )}
       </div>
@@ -1157,14 +1248,12 @@ function SignoffModal({ open, catId, name, setName, relation, setRelation, pin, 
 
 // ─── SHARED COMPONENTS ────────────────────────────────────────────────────────
 function ProgressRing({ pct, count }) {
-  const r = 52, circ = 2 * Math.PI * r;
-  const dash = (pct / 100) * circ;
+  const r = 52, circ = 2 * Math.PI * r, dash = (pct / 100) * circ;
   return (
     <div style={{ position: "relative", width: 140, height: 140, display: "flex", alignItems: "center", justifyContent: "center" }}>
       <svg width="140" height="140" style={{ position: "absolute", top: 0, left: 0, transform: "rotate(-90deg)" }}>
         <circle cx="70" cy="70" r={r} fill="none" stroke="rgba(255,255,255,.2)" strokeWidth="10" />
-        <circle cx="70" cy="70" r={r} fill="none" stroke="#fff" strokeWidth="10"
-          strokeDasharray={`${dash} ${circ}`} strokeLinecap="round" style={{ transition: "stroke-dasharray .6s ease" }} />
+        <circle cx="70" cy="70" r={r} fill="none" stroke="#fff" strokeWidth="10" strokeDasharray={`${dash} ${circ}`} strokeLinecap="round" style={{ transition: "stroke-dasharray .6s ease" }} />
       </svg>
       <div style={{ textAlign: "center", zIndex: 1 }}>
         <div style={{ fontSize: 28, fontWeight: 700, lineHeight: 1 }}>{count}</div>
@@ -1177,25 +1266,14 @@ function ProgressRing({ pct, count }) {
 
 function ExperienceRow({ item, checked, onToggle, accent, sub }) {
   return (
-    <div onClick={onToggle} style={{
-      display: "flex", alignItems: "flex-start", gap: 12, padding: "12px 14px",
-      background: checked ? `${accent}12` : "#fff", borderRadius: 10, marginBottom: 7, cursor: "pointer",
-      border: `1.5px solid ${checked ? accent + "40" : "#E8E4DC"}`, transition: "background .15s, border .15s",
-    }}>
-      <div style={{
-        width: 24, height: 24, minWidth: 24, borderRadius: 6,
-        border: `2px solid ${checked ? accent : "#CCC"}`,
-        background: checked ? accent : "transparent",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        transition: "all .15s", marginTop: 1,
-      }}>
+    <div onClick={onToggle} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "12px 14px", background: checked ? `${accent}12` : "#fff", borderRadius: 10, marginBottom: 7, cursor: "pointer", border: `1.5px solid ${checked ? accent + "40" : "#E8E4DC"}`, transition: "background .15s, border .15s" }}>
+      <div style={{ width: 24, height: 24, minWidth: 24, borderRadius: 6, border: `2px solid ${checked ? accent : "#CCC"}`, background: checked ? accent : "transparent", display: "flex", alignItems: "center", justifyContent: "center", transition: "all .15s", marginTop: 1 }}>
         {checked && <span style={{ color: "#fff", fontSize: 13, fontWeight: 700 }}>✓</span>}
       </div>
       <div style={{ flex: 1 }}>
         {sub && <div style={{ fontSize: 10, color: "#999", marginBottom: 2 }}>{sub}</div>}
         <div style={{ fontSize: 14, color: checked ? "#555" : "#222", textDecoration: checked ? "line-through" : "none", lineHeight: 1.4 }}>
-          <span style={{ color: "#AAA", fontSize: 11, marginRight: 4 }}>#{item.n}</span>
-          {item.t}
+          <span style={{ color: "#AAA", fontSize: 11, marginRight: 4 }}>#{item.n}</span>{item.t}
         </div>
       </div>
     </div>
@@ -1214,12 +1292,8 @@ function TopBar({ onBack, title }) {
 function BottomNav({ view, setView }) {
   return (
     <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff", borderTop: "1px solid #EEE", display: "flex", zIndex: 20 }}>
-      {[{ id: "home", icon: "🏠", label: "Home" }, { id: "search", icon: "🔍", label: "Search" }, { id: "profile", icon: "📊", label: "My Stats" }].map(it => (
-        <button key={it.id} onClick={() => setView(it.id)} style={{
-          flex: 1, padding: "10px 0 12px", border: "none", background: "none",
-          display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
-          cursor: "pointer", color: view === it.id ? "#1B4B3A" : "#999",
-        }}>
+      {[{ id: "home", icon: "🏠", label: "Home" }, { id: "search", icon: "🔍", label: "Search" }, { id: "leaderboard", icon: "🏆", label: "Board" }, { id: "profile", icon: "📊", label: "My Stats" }].map(it => (
+        <button key={it.id} onClick={() => setView(it.id)} style={{ flex: 1, padding: "10px 0 12px", border: "none", background: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 2, cursor: "pointer", color: view === it.id ? "#1B4B3A" : "#999" }}>
           <span style={{ fontSize: 20 }}>{it.icon}</span>
           <span style={{ fontSize: 10, fontFamily: "sans-serif" }}>{it.label}</span>
         </button>
@@ -1240,11 +1314,7 @@ function StatCard({ label, value, color }) {
 function ConfettiOverlay({ show, onDone }) {
   if (!show) return null;
   return (
-    <div onClick={onDone} style={{
-      position: "fixed", inset: 0, zIndex: 100, background: "rgba(27,75,58,.92)",
-      display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-      color: "#fff", textAlign: "center", padding: 32, cursor: "pointer",
-    }}>
+    <div onClick={onDone} style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(27,75,58,.92)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#fff", textAlign: "center", padding: 32, cursor: "pointer" }}>
       <div style={{ fontSize: 72 }}>🎓</div>
       <h2 style={{ fontFamily: "'Georgia', serif", fontSize: 28, margin: "16px 0 8px" }}>You Did It!</h2>
       <p style={{ fontSize: 16, opacity: .85, maxWidth: 280, lineHeight: 1.5 }}>All 1,000 experiences complete. Grant County is proud of you!</p>
