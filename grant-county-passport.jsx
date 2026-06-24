@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 
 // ─── SCHOOLS ─────────────────────────────────────────────────────────────────
 const SCHOOLS = [
@@ -682,6 +682,97 @@ function saveLeaderboard(board) {
   try { localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(board)); } catch {}
 }
 
+// ─── NOTIFICATIONS ────────────────────────────────────────────────────────────
+const NOTIF_MESSAGES = [
+  { title: "📖 Your Passport is waiting!", body: "You've got experiences to check off. What will you do today?" },
+  { title: "🌿 Ready for an adventure?", body: "Open your Grant County Passport and mark something new!" },
+  { title: "🎯 Keep the streak going!", body: "Even one experience a day adds up fast. Open your Passport!" },
+  { title: "🏆 Grant County is counting on you!", body: "Check in and add to your school's leaderboard total." },
+  { title: "✨ Small things, great joy!", body: "Have you tried something new lately? Your Passport is ready." },
+  { title: "🎉 So many experiences await!", body: "Jump back into your 1,000 Things Passport and explore!" },
+  { title: "🌟 You're doing great!", body: "Keep going — every experience brings you closer to graduation." },
+  { title: "🤝 Give a little bit today?", body: "Check off a community service experience in your Passport." },
+  { title: "🍽️ Taste something new?", body: "The Taste Test category has some delicious challenges waiting." },
+  { title: "👨‍👩‍👧‍👦 Family time counts!", body: "Several Passport experiences are best done with family — check them out!" },
+  { title: "🔬 Curious about the world?", body: "Science Lab experiences are waiting for you in your Passport." },
+  { title: "📸 Strike a pose!", body: "Photo Opportunity experiences make great memories. Open your Passport!" },
+];
+
+const NOTIF_FREQUENCIES = [
+  { id: "daily",   label: "Daily",          ms: 24 * 60 * 60 * 1000 },
+  { id: "every3",  label: "Every 3 days",   ms: 3  * 24 * 60 * 60 * 1000 },
+  { id: "weekly",  label: "Weekly",         ms: 7  * 24 * 60 * 60 * 1000 },
+  { id: "monthly", label: "Monthly",        ms: 30 * 24 * 60 * 60 * 1000 },
+];
+
+const SW_KEY = "grantco_sw_registered";
+const NOTIF_STORE_KEY = "grantco_notif_settings";
+
+function loadNotifSettings() {
+  try {
+    const raw = localStorage.getItem(NOTIF_STORE_KEY);
+    return raw ? JSON.parse(raw) : { enabled: false, frequencyId: "weekly", hour: 9, nextAt: null };
+  } catch { return { enabled: false, frequencyId: "weekly", hour: 9, nextAt: null }; }
+}
+function saveNotifSettings(s) {
+  try { localStorage.setItem(NOTIF_STORE_KEY, JSON.stringify(s)); } catch {}
+}
+
+function pickMessage(count) {
+  // Slightly bias toward motivational when progress is low
+  const idx = (Date.now() + count) % NOTIF_MESSAGES.length;
+  return NOTIF_MESSAGES[idx];
+}
+
+async function registerSW() {
+  if (!("serviceWorker" in navigator)) return null;
+  try {
+    // In GitHub Pages the SW lives at root
+    const reg = await navigator.serviceWorker.register("./passport-sw.js", { scope: "./" });
+    return reg;
+  } catch { return null; }
+}
+
+async function requestNotifPermission() {
+  if (!("Notification" in window)) return "unsupported";
+  if (Notification.permission === "granted") return "granted";
+  if (Notification.permission === "denied") return "denied";
+  const result = await Notification.requestPermission();
+  return result;
+}
+
+function scheduleNextNotif(settings, count) {
+  if (!("serviceWorker" in navigator) || !("Notification" in window)) return;
+  if (Notification.permission !== "granted") return;
+  if (!settings.enabled) return;
+
+  const freq = NOTIF_FREQUENCIES.find(f => f.id === settings.frequencyId) || NOTIF_FREQUENCIES[2];
+  const now = Date.now();
+
+  // Work out the next fire time: next occurrence of settings.hour:00 after `freq.ms` from now
+  const nextBase = now + freq.ms;
+  const d = new Date(nextBase);
+  d.setHours(settings.hour || 9, 0, 0, 0);
+  if (d.getTime() < nextBase) d.setDate(d.getDate() + 1);
+  const delay = d.getTime() - now;
+
+  const msg = pickMessage(count);
+
+  navigator.serviceWorker.ready.then(reg => {
+    reg.active?.postMessage({
+      type: "SCHEDULE_NOTIFICATION",
+      delay,
+      title: msg.title,
+      body: msg.body,
+      tag: "grantco-reminder",
+    });
+  });
+
+  const updated = { ...settings, nextAt: d.getTime() };
+  saveNotifSettings(updated);
+  return updated;
+}
+
 // ─── MEDALS ───────────────────────────────────────────────────────────────────
 function medal(rank) {
   if (rank === 1) return "🥇";
@@ -698,6 +789,14 @@ export default function PassportApp() {
   const [search, setSearch] = useState("");
   const [confetti, setConfetti] = useState(false);
   const [leaderboard, setLeaderboard] = useState(loadLeaderboard);
+
+  // Notification state
+  const [notifSettings, setNotifSettings] = useState(loadNotifSettings);
+  const [notifPermission, setNotifPermission] = useState(
+    typeof Notification !== "undefined" ? Notification.permission : "unsupported"
+  );
+  const [notifSaving, setNotifSaving] = useState(false);
+  const [notifMsg, setNotifMsg] = useState("");
 
   // Sign-off modal state
   const [signoffModal, setSignoffModal] = useState(null);
@@ -728,6 +827,74 @@ export default function PassportApp() {
     setLeaderboard(updated);
     saveLeaderboard(updated);
   }, [data]);
+
+  // ── Register service worker on mount ───────────────────────────────────────
+  useEffect(() => {
+    registerSW();
+  }, []);
+
+  // ── Reschedule notification whenever settings or progress changes ────────────
+  useEffect(() => {
+    if (notifSettings.enabled && notifPermission === "granted") {
+      scheduleNextNotif(notifSettings, totalChecked);
+    }
+  }, [notifSettings, notifPermission, totalChecked]);
+
+  // ── Notification handlers ────────────────────────────────────────────────────
+  async function handleEnableNotif() {
+    setNotifSaving(true);
+    setNotifMsg("");
+    const perm = await requestNotifPermission();
+    setNotifPermission(perm);
+    if (perm === "granted") {
+      const next = { ...notifSettings, enabled: true };
+      setNotifSettings(next);
+      saveNotifSettings(next);
+      scheduleNextNotif(next, totalChecked);
+      setNotifMsg("✅ Reminders enabled! You'll get notified to check in.");
+    } else if (perm === "denied") {
+      setNotifMsg("❌ Notifications blocked. Please allow them in your browser settings and try again.");
+    } else {
+      setNotifMsg("Notifications not granted. Try again.");
+    }
+    setNotifSaving(false);
+    setTimeout(() => setNotifMsg(""), 4000);
+  }
+
+  function handleDisableNotif() {
+    const next = { ...notifSettings, enabled: false };
+    setNotifSettings(next);
+    saveNotifSettings(next);
+    setNotifMsg("Reminders turned off.");
+    setTimeout(() => setNotifMsg(""), 3000);
+  }
+
+  function handleNotifFrequency(id) {
+    const next = { ...notifSettings, frequencyId: id };
+    setNotifSettings(next);
+    saveNotifSettings(next);
+    if (notifSettings.enabled && notifPermission === "granted") {
+      scheduleNextNotif(next, totalChecked);
+    }
+  }
+
+  function handleNotifHour(h) {
+    const next = { ...notifSettings, hour: parseInt(h, 10) };
+    setNotifSettings(next);
+    saveNotifSettings(next);
+    if (notifSettings.enabled && notifPermission === "granted") {
+      scheduleNextNotif(next, totalChecked);
+    }
+  }
+
+  async function handleTestNotif() {
+    if (notifPermission !== "granted") {
+      await handleEnableNotif();
+      return;
+    }
+    const msg = pickMessage(totalChecked);
+    new Notification(msg.title, { body: msg.body, icon: "./passport-icon.png" });
+  }
 
   function toggle(n) {
     const next = { ...data, checked: { ...data.checked, [n]: !data.checked[n] } };
@@ -1067,6 +1234,89 @@ export default function PassportApp() {
                 <div style={{ position: "absolute", top: 3, left: data.showOnBoard !== false ? 23 : 3, width: 20, height: 20, borderRadius: "50%", background: "#fff", transition: "left .2s", boxShadow: "0 1px 3px rgba(0,0,0,.2)" }} />
               </button>
             </div>
+          </div>
+
+          {/* ── Notification Settings Card ── */}
+          <div style={{ marginTop: 16, background: "#fff", borderRadius: 14, padding: 20, boxShadow: "0 1px 6px rgba(0,0,0,.06)" }}>
+            <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 2, color: "#888", marginBottom: 16 }}>🔔 Reminder Notifications</div>
+
+            {notifPermission === "unsupported" ? (
+              <div style={{ fontSize: 13, color: "#888", lineHeight: 1.5 }}>
+                Push notifications aren't supported in this browser. Try Chrome or Edge on Android, or Safari on iOS 16.4+.
+              </div>
+            ) : (
+              <>
+                <div style={{ fontSize: 13, color: "#555", marginBottom: 16, lineHeight: 1.5 }}>
+                  Get friendly reminders to open your Passport and check off new experiences.
+                </div>
+
+                {/* Enable / Disable toggle */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: 14, marginBottom: 14, borderBottom: "1px solid #F0EDE8" }}>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600 }}>Enable Reminders</div>
+                    <div style={{ fontSize: 11, color: "#888", marginTop: 2 }}>
+                      {notifPermission === "denied" ? "⚠️ Blocked by browser — check site settings" : notifSettings.enabled ? "Reminders are on" : "Reminders are off"}
+                    </div>
+                  </div>
+                  <button
+                    onClick={notifSettings.enabled ? handleDisableNotif : handleEnableNotif}
+                    disabled={notifSaving || notifPermission === "denied"}
+                    style={{ width: 46, height: 26, borderRadius: 13, border: "none", cursor: notifPermission === "denied" ? "not-allowed" : "pointer", background: notifSettings.enabled && notifPermission === "granted" ? "#2D7A56" : "#CCC", transition: "background .2s", position: "relative", flexShrink: 0, opacity: notifPermission === "denied" ? 0.5 : 1 }}>
+                    <div style={{ position: "absolute", top: 3, left: notifSettings.enabled && notifPermission === "granted" ? 23 : 3, width: 20, height: 20, borderRadius: "50%", background: "#fff", transition: "left .2s", boxShadow: "0 1px 3px rgba(0,0,0,.2)" }} />
+                  </button>
+                </div>
+
+                {/* Frequency picker */}
+                <div style={{ marginBottom: 14 }}>
+                  <label style={{ display: "block", fontSize: 12, color: "#555", marginBottom: 6 }}>Reminder Frequency</label>
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    {NOTIF_FREQUENCIES.map(f => (
+                      <button key={f.id} onClick={() => handleNotifFrequency(f.id)}
+                        style={{ padding: "6px 12px", borderRadius: 20, border: `1.5px solid ${notifSettings.frequencyId === f.id ? "#2D7A56" : "#E0DDD8"}`, background: notifSettings.frequencyId === f.id ? "#2D7A5615" : "#fff", color: notifSettings.frequencyId === f.id ? "#2D7A56" : "#555", fontSize: 12, cursor: "pointer", fontFamily: "inherit", fontWeight: notifSettings.frequencyId === f.id ? 700 : 400 }}>
+                        {f.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Time of day picker */}
+                <div style={{ marginBottom: 16 }}>
+                  <label style={{ display: "block", fontSize: 12, color: "#555", marginBottom: 6 }}>Preferred Time</label>
+                  <select value={notifSettings.hour ?? 9} onChange={e => handleNotifHour(e.target.value)}
+                    style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1.5px solid #E0DDD8", fontSize: 14, fontFamily: "inherit", background: "#fff" }}>
+                    {Array.from({ length: 24 }, (_, i) => {
+                      const label = i === 0 ? "12:00 AM (midnight)" : i < 12 ? `${i}:00 AM` : i === 12 ? "12:00 PM (noon)" : `${i - 12}:00 PM`;
+                      return <option key={i} value={i}>{label}</option>;
+                    })}
+                  </select>
+                </div>
+
+                {/* Next scheduled */}
+                {notifSettings.enabled && notifSettings.nextAt && notifPermission === "granted" && (
+                  <div style={{ background: "#F0F7F4", borderRadius: 8, padding: "8px 12px", fontSize: 12, color: "#2D5A47", marginBottom: 12 }}>
+                    📅 Next reminder: {new Date(notifSettings.nextAt).toLocaleString("en-US", { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
+                  </div>
+                )}
+
+                {/* Test button */}
+                <button onClick={handleTestNotif}
+                  style={{ width: "100%", padding: "10px", borderRadius: 8, border: "1.5px solid #2D7A56", background: "transparent", color: "#2D7A56", fontFamily: "inherit", fontSize: 13, cursor: "pointer", fontWeight: 600 }}>
+                  🔔 Send a Test Notification
+                </button>
+
+                {/* Feedback message */}
+                {notifMsg && (
+                  <div style={{ marginTop: 10, fontSize: 12, color: notifMsg.startsWith("✅") ? "#2D7A56" : notifMsg.startsWith("❌") ? "#C0392B" : "#666", textAlign: "center", lineHeight: 1.4 }}>
+                    {notifMsg}
+                  </div>
+                )}
+
+                {/* Browser tip for iOS */}
+                <div style={{ marginTop: 12, fontSize: 11, color: "#aaa", lineHeight: 1.5 }}>
+                  <strong>iPhone users:</strong> Tap Share → "Add to Home Screen" first, then enable notifications from the installed app.
+                </div>
+              </>
+            )}
           </div>
 
           {/* Sign-off summary */}
